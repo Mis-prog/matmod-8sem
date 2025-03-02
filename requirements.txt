@@ -3,3 +3,4 @@ matplotlib
 tqdm
 pygame
 jupyter
+pandas
