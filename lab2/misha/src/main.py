@@ -4,7 +4,12 @@ import os
 import pygame
 import sys
 
+if not os.path.exists("result/frames_gamelife"):
+    os.makedirs("result/frames_gamelife")
+
+
 def main():
+    frame_count = 0
     CELL_SIZE = 15  # Размер клетки в пикселях
     GRID_COLOR = (50, 50, 50)  # Цвет сетки
     ALIVE_COLOR = (255, 255, 255)  # Цвет живых клеток
@@ -12,17 +17,15 @@ def main():
     BACKGROUND_COLOR = (10, 10, 10)
     FPS = 10
 
-
     size = 32
     distribution_ratio = 0.3
-
 
     width = size * CELL_SIZE
     height = size * CELL_SIZE
 
     # Инициализация pygame
     pygame.init()
-    screen = pygame.display.set_mode((width, height),pygame.RESIZABLE)
+    screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
     pygame.display.set_caption("Игра 'Жизнь'")
     clock = pygame.time.Clock()
     font = pygame.font.SysFont(None, 24)
@@ -87,6 +90,8 @@ def main():
         # Обновляем экран
         pygame.display.flip()
 
+        pygame.image.save(screen, f"result/frames_gamelife/frame_{frame_count}.png")
+        frame_count += 1
         # Ограничиваем FPS
         clock.tick(FPS)
 
