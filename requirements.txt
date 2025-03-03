@@ -1,0 +1,6 @@
+pandas
+jupyter 
+numpy 
+matplotlib
+openpyxl
+tqdm
