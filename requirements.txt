@@ -1,6 +1,5 @@
-pandas
-jupyter 
 numpy 
-matplotlib
-openpyxl
+matplotlib 
+jupyter
 tqdm
+pandas
