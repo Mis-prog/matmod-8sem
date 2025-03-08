@@ -3,6 +3,7 @@
 #include <random>
 #include <Eigen/Dense>
 #include <fstream>
+#include <iomanip>
 
 #include "params.h"
 
@@ -34,11 +35,12 @@ int main() {
     uniform_int_distribution<> dir_distrib(0, 3);
 
     const int M = 1e5;
-    const int N = 1e2;
+    const int N = 1e3;
 
     MatrixXd init_vals(M, 2);
     init_vals.setZero();
-
+    std::ofstream out("../lab1/misha/result/calc.csv");
+    out << "<x>\t<y>\t<R>\t<x^2>\t<y^2>\t<Δx^2>\t<Δy^2>\t<ΔR^2>" << std::endl;
 
     for (int i = 0; i < N; i++) {
         VectorXd curr_l(M);
@@ -50,12 +52,16 @@ int main() {
             int dir = dir_distrib(gen);
             curr_dirs.row(j) = direction.row(dir);
         }
-        init_vals += curr_l.asDiagonal() * curr_dirs.cast<double>();
+        MatrixXd temp_result = curr_l.asDiagonal() * curr_dirs.cast<double>();
 
-
+        init_vals += temp_result;
+        VectorXd result = calc(init_vals);
+        for (int k = 0; k < result.size(); k++) {
+            out << result[k] << "\t";
+        }
+        out << endl;
     }
 
-//    cout << init_vals;
-    cout << calc(init_vals);
+    out.close();
     return 0;
 }
