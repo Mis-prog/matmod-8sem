@@ -7,3 +7,5 @@ target_include_directories(
         PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/../../eigen-3.4.0
 )
+
+target_compile_options(lab1_alia PRIVATE -O3)
