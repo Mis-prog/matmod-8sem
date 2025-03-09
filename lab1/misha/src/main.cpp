@@ -15,7 +15,7 @@ using namespace std;
 using namespace Eigen;
 
 const int M = 1e5;
-const int N = 1e6;
+const int N = 1e2;
 
 
 Eigen::VectorXd calc(const Eigen::MatrixXd& A)
@@ -36,20 +36,6 @@ Eigen::VectorXd calc(const Eigen::MatrixXd& A)
 
 int main()
 {
-    using namespace indicators;
-    ProgressBar bar{
-        option::BarWidth{50},
-        option::Start{"["},
-        option::Fill{"="},
-        option::Lead{">"},
-        option::Remainder{" "},
-        option::End{"]"},
-        option::PostfixText{"Extracting Archive"},
-        option::ForegroundColor{Color::green},
-        option::FontStyles{std::vector<FontStyle>{FontStyle::bold}},
-        option::MaxProgress{N}
-    };
-
     Matrix<int, 4, 2> direction;
     direction << 0, 1, 1, 0, 0, -1, -1, 0;
 
@@ -67,14 +53,14 @@ int main()
         std::cout << "Папка создана: " << dir << std::endl;
     }
     std::ofstream out_calc("../lab1/misha/result/calc.csv"), out_first_particle(
-                      "../lab1/misha/result/first_particle.csv");
+                      "../lab1/misha/result/first_particle.csv"), out_last_vals("../lab1/misha/result/last_vals.csv");
     out_calc << "N <x> <y> <R> <x^2> <y^2> <Δx^2> <Δy^2> <ΔR^2>" << std::endl;
+
     out_first_particle << "x y" << endl;
+    out_last_vals << "x y" << endl;
 
     for (int i = 0; i < N; i++)
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
         VectorXd curr_l(M);
         MatrixXi curr_dirs(M, 2);
         for (int j = 0; j < M; j++)
@@ -100,10 +86,13 @@ int main()
             out_first_particle << first_particle(k) << " ";
         }
         out_first_particle << endl;
-        bar.set_progress(i + 1);
     }
 
-    bar.mark_as_completed();
+    for (int i = 0; i < init_vals.rows(); ++i) {
+        out_last_vals << init_vals(i, 0) << " " << init_vals(i, 1) << "\n";
+    }
+
+    out_last_vals << endl;
     out_first_particle.close();
     out_calc.close();
     return 0;
