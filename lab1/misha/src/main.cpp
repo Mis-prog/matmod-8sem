@@ -1,13 +1,10 @@
+
 #include <iostream>
-#include <omp.h>
 #include <random>
 #include <Eigen/Dense>
 #include <fstream>
 #include <iomanip>
 #include <filesystem>
-#include <indicators/progress_bar.hpp>
-#include <thread>
-#include <chrono>
 
 #include "params.h"
 
@@ -15,11 +12,10 @@ using namespace std;
 using namespace Eigen;
 
 const int M = 1e5;
-const int N = 1e2;
+const int N = 2e6;
 
 
-Eigen::VectorXd calc(const Eigen::MatrixXd& A)
-{
+Eigen::VectorXd calc(const Eigen::MatrixXd &A) {
     Eigen::VectorXd result(8);
     double x_N = A.col(0).mean();
     double y_N = A.col(1).mean();
@@ -34,8 +30,7 @@ Eigen::VectorXd calc(const Eigen::MatrixXd& A)
     return result;
 }
 
-int main()
-{
+int main() {
     Matrix<int, 4, 2> direction;
     direction << 0, 1, 1, 0, 0, -1, -1, 0;
 
@@ -48,41 +43,43 @@ int main()
     init_vals.setZero();
 
     filesystem::path dir = "../lab1/misha/result";
-    if (filesystem::create_directory(dir))
-    {
+    if (filesystem::create_directory(dir)) {
         std::cout << "Папка создана: " << dir << std::endl;
     }
     std::ofstream out_calc("../lab1/misha/result/calc.csv"), out_first_particle(
-                      "../lab1/misha/result/first_particle.csv"), out_last_vals("../lab1/misha/result/last_vals.csv");
+            "../lab1/misha/result/first_particle.csv"), out_last_vals("../lab1/misha/result/last_vals.csv");
     out_calc << "N <x> <y> <R> <x^2> <y^2> <Δx^2> <Δy^2> <ΔR^2>" << std::endl;
 
     out_first_particle << "x y" << endl;
     out_last_vals << "x y" << endl;
 
-    for (int i = 0; i < N; i++)
-    {
+    for (int i = 0; i < N; i++) {
         VectorXd curr_l(M);
         MatrixXi curr_dirs(M, 2);
-        for (int j = 0; j < M; j++)
-        {
+
+
+        for (int j = 0; j < M; j++) {
             // Генерация случайных длин шагов
             curr_l(j) = f_inv(distrib(gen));
             // Генерация случайных направлений
             int dir = dir_distrib(gen);
             curr_dirs.row(j) = direction.row(dir);
         }
-        init_vals += curr_l.asDiagonal() * curr_dirs.cast<double>();
-        VectorXd result = calc(init_vals);
 
-        out_calc << i << " ";
-        for (int k = 0; k < result.size(); k++)
-        {
-            out_calc << result[k] << " ";
+        init_vals += curr_l.asDiagonal() * curr_dirs.cast<double>();
+
+        if (i % 1000 == 0) {
+            VectorXd result = calc(init_vals);
+
+            out_calc << i << " ";
+            for (int k = 0; k < result.size(); k++) {
+                out_calc << result[k] << " ";
+            }
+            out_calc << endl;
         }
-        out_calc << endl;
+
         auto first_particle = init_vals.row(0);
-        for (int k = 0; k < 2; k++)
-        {
+        for (int k = 0; k < 2; k++) {
             out_first_particle << first_particle(k) << " ";
         }
         out_first_particle << endl;
