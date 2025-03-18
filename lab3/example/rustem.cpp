@@ -186,7 +186,7 @@ int main()
     // cout <<f << endl;
     // cout << s << endl;
     // cout << sol << endl;
-    ofstream file("../lab3/example/result/result" + to_string(int(k)) + "y0" + to_string(ynull) + ".txt");
+    ofstream file("result" + to_string(int(k)) + "y0" + to_string(ynull) + ".txt");
     for (int j = 0; j < Ny + 1; j += 4)
     {
         for (int i = 0; i < Nx + 1; i += 4)
