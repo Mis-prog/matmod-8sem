@@ -1,5 +1,9 @@
 #include <cmath>
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 const double A = M_PI / 2;
 
 double f_small(double l) {

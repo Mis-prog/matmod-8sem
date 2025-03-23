@@ -8,4 +8,9 @@ target_include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}/../../eigen-3.4.0
 )
 
-target_compile_options(lab1_misha PRIVATE -O3)
+target_compile_options(lab1_misha
+                       PRIVATE
+                        /O2
+                        /Ot 
+                        /fp:fast
+                        )       
