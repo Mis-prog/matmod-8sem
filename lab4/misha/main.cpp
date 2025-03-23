@@ -1,40 +1,32 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <fstream>
 
 using namespace std;
 
-constexpr int len_N = 1, len_K = 1;
-constexpr double h_x = 0.1, h_y = 0.1;
+constexpr int len_N = 1, len_K = 10;
+constexpr double hx = 0.1, hy1 = 0.1, hy2 = 0.1;
 constexpr double density = 725.0, dynamic_viscosity = 0.53e-3;
 constexpr double nu = dynamic_viscosity / density;
 constexpr double v0_x = 2;
 
 int main()
 {
-    int K = ceil(len_K / h_y);
-    int N = ceil(len_N / h_x);
-    vector<vector<double>> wx(N, vector<double>(K, 0));
-    vector<vector<double>> wy(N, vector<double>(K, 0));
+    int K = ceil(len_K / hy1);
+    int N = ceil(len_N / hx);
+    vector<vector<double>> u(N, vector<double>(K, 0));
+    vector<vector<double>> v(N, vector<double>(K, 0));
 
 
     for (int j = 0; j < K; j++)
     {
-        wx[0][j] = v0_x;
+        u[0][j] = v0_x;
     }
 
     for (int i = 0; i < N; i++)
     {
-        wx[i][K - 1] = v0_x;
-    }
-
-    for (int i = 0; i < N; i++)
-    {
-        for (int j = 0; j < K; j++)
-        {
-            cout << wx[i][j] << " ";
-        }
-        cout << endl;
+        v[i][K - 1] = v0_x;
     }
 
     cout << endl;
@@ -43,17 +35,27 @@ int main()
     {
         for (int j = 1; j < K - 1; j++)
         {
-            wx[i][j] = wx[i - 1][j] + nu * h_x / wy[i - 1][j] * ((wx[i - 1][j + 1] - 2 * wx[i - 1][j] + wx[i - 1][j -
-                1]) / pow(h_y, 2)) - h_x * (wy[i - 1][j] / wx[i - 1][j]) * (wx[i - 1][j] - wx[i - 1][j - 1]) / h_y;
-            wy[i][j] = wy[i][j - 1] - h_y * (wx[i][j - 1] - wx[i - 1][j - 1]) / h_x;
+            u[i][j] = u[i - 1][j]
+                + hx / u[i - 1][j] *
+                (2 * nu / (hy2 * (hy1 + hy2)) * u[i - 1][j + 1]
+                    + 2 * nu / (hy1 * (hy1 + hy2)) * u[i - 1][j - 1]
+                    - 2 * nu / (hy1 * hy2) * u[i - 1][j])
+                - hx * v[i - 1][j] / u[i - 1][j] *
+                (hy1 * hy1 / (hy1 * hy2 * (hy1 + hy2)) * u[i - 1][j + 1]
+                    - hy2 * hy2 / (hy1 * hy2 * (hy1 + hy2)) * u[i - 1][j - 1]
+                    + u[i - 1][j] * (hy2 * hy2 - hy1 * hy1) / (hy1 * hy2 * (hy1 + hy2)));
+            v[i][j] = v[i][j - 1] - hy1 / hx * (u[i][j - 1] - u[i - 1][j - 1]);
         }
     }
-    for (int i = 0; i < N; i++)
+
+    ofstream fout("../lab4/misha/result/results.txt");
+    for (int j = 0; j < K; j++)
     {
-        for (int j = 0; j < K; j++)
+        for (int i = 0; i < N; i++)
         {
-            cout << wx[i][j] << " ";
+            fout << u[i][j] << " ";
         }
-        cout << endl;
+        fout << endl;
     }
+    fout.close();
 }
