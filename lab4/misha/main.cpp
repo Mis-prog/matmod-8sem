@@ -4,8 +4,8 @@
 
 using namespace std;
 
-constexpr int len_N = 100, len_K = 10;
-constexpr double h_x = 1, h_y = 0.01;
+constexpr int len_N = 1, len_K = 1;
+constexpr double h_x = 0.1, h_y = 0.1;
 constexpr double density = 725.0, dynamic_viscosity = 0.53e-3;
 constexpr double nu = dynamic_viscosity / density;
 constexpr double v0_x = 2;
@@ -25,13 +25,23 @@ int main()
 
     for (int i = 0; i < N; i++)
     {
-        wx[i][K] = v0_x;
+        wx[i][K - 1] = v0_x;
     }
 
-
-    for (int i = 1; i < len_N; i++)
+    for (int i = 0; i < N; i++)
     {
-        for (int j = 1; j < len_K; j++)
+        for (int j = 0; j < K; j++)
+        {
+            cout << wx[i][j] << " ";
+        }
+        cout << endl;
+    }
+
+    cout << endl;
+
+    for (int i = 1; i < N; i++)
+    {
+        for (int j = 1; j < K - 1; j++)
         {
             wx[i][j] = wx[i - 1][j] + nu * h_x / wy[i - 1][j] * ((wx[i - 1][j + 1] - 2 * wx[i - 1][j] + wx[i - 1][j -
                 1]) / pow(h_y, 2)) - h_x * (wy[i - 1][j] / wx[i - 1][j]) * (wx[i - 1][j] - wx[i - 1][j - 1]) / h_y;
@@ -42,7 +52,7 @@ int main()
     {
         for (int j = 0; j < K; j++)
         {
-            cout << wy[i][j] << " ";
+            cout << wx[i][j] << " ";
         }
         cout << endl;
     }
