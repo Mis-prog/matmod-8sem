@@ -5,7 +5,11 @@
     cd lab1
     git clone https://github.com/p-ranav/indicators
 ```
-### 2. [Eigen 3.4.0](https://gitlab.com/libeigen/eigen/-/releases/3.4.0)
+### 2. Eigen
+```bash 
+    cd lab1
+    git clone https://gitlab.com/libeigen/eigen.git
+```
 
 Задания
 -----
