@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iomanip>
 #include <filesystem>
+#include <omp.h>
 
 #include "params.h"
 
@@ -59,7 +60,7 @@ int main() {
         VectorXd curr_l(M);
         MatrixXi curr_dirs(M, 2);
 
-
+#pragma omp simd
         for (int j = 0; j < M; j++) {
             // Генерация случайных длин шагов
             curr_l(j) = f_inv(distrib(gen));
@@ -70,7 +71,8 @@ int main() {
 
         init_vals += curr_l.asDiagonal() * curr_dirs.cast<double>();
 
-        if (i == 1) {
+
+        if (i == 1 || i % 500 == 0) {
             VectorXd result = calc(init_vals);
 
             out_calc << i << " ";
@@ -79,26 +81,9 @@ int main() {
             }
             out_calc << endl;
 
-            auto end = std::chrono::high_resolution_clock::now(); 
+            auto end = std::chrono::high_resolution_clock::now();
 
-            std::chrono::duration<double> elapsed = end - start; 
-
-            cout << "Выполняется шаг: " << i << " время: " << elapsed.count() << endl;
-        }
-
-
-        if (i % 500 == 0) {
-            VectorXd result = calc(init_vals);
-
-            out_calc << i << " ";
-            for (int k = 0; k < result.size(); k++) {
-                out_calc << result[k] << " ";
-            }
-            out_calc << endl;
-
-            auto end = std::chrono::high_resolution_clock::now(); 
-
-            std::chrono::duration<double> elapsed = end - start; 
+            std::chrono::duration<double> elapsed = end - start;
 
             cout << "Выполняется шаг: " << i << " время: " << elapsed.count() << endl;
         }
