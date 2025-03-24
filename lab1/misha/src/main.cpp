@@ -11,8 +11,8 @@
 using namespace std;
 using namespace Eigen;
 
-const int M = 1e5;
-const int N = 2e6;
+const int M = 5e5;
+const int N = 1e6;
 
 
 Eigen::VectorXd calc(const Eigen::MatrixXd &A) {
@@ -53,7 +53,9 @@ int main() {
     out_first_particle << "x y" << endl;
     out_last_vals << "x y" << endl;
 
-    for (int i = 0; i < N; i++) {
+    auto start = std::chrono::high_resolution_clock::now();
+
+    for (int i = 1; i < N; i++) {
         VectorXd curr_l(M);
         MatrixXi curr_dirs(M, 2);
 
@@ -68,7 +70,7 @@ int main() {
 
         init_vals += curr_l.asDiagonal() * curr_dirs.cast<double>();
 
-        if (i % 1000 == 0) {
+        if (i == 1) {
             VectorXd result = calc(init_vals);
 
             out_calc << i << " ";
@@ -76,6 +78,29 @@ int main() {
                 out_calc << result[k] << " ";
             }
             out_calc << endl;
+
+            auto end = std::chrono::high_resolution_clock::now(); 
+
+            std::chrono::duration<double> elapsed = end - start; 
+
+            cout << "Выполняется шаг: " << i << " время: " << elapsed.count() << endl;
+        }
+
+
+        if (i % 500 == 0) {
+            VectorXd result = calc(init_vals);
+
+            out_calc << i << " ";
+            for (int k = 0; k < result.size(); k++) {
+                out_calc << result[k] << " ";
+            }
+            out_calc << endl;
+
+            auto end = std::chrono::high_resolution_clock::now(); 
+
+            std::chrono::duration<double> elapsed = end - start; 
+
+            cout << "Выполняется шаг: " << i << " время: " << elapsed.count() << endl;
         }
 
         auto first_particle = init_vals.row(0);

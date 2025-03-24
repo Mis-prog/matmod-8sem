@@ -2,3 +2,4 @@ cmake*/
 .idea/
 venv/
 lab3/
+build/
