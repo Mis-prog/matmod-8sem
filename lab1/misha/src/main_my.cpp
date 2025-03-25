@@ -5,7 +5,6 @@
 #include <fstream>
 #include <iomanip>
 #include <filesystem>
-#include <omp.h>
 
 #include "params.h"
 
@@ -54,7 +53,7 @@ int main() {
     out_first_particle << "x y" << endl;
     out_last_vals << "x y" << endl;
 
-    auto start = std::chrono::high_resolution_clock::now();
+    // auto start = std::chrono::high_resolution_clock::now();
 
     for (int i = 1; i < N; i++) {
         VectorXd curr_l(M);
@@ -81,11 +80,11 @@ int main() {
             }
             out_calc << endl;
 
-            auto end = std::chrono::high_resolution_clock::now();
+            // auto end = std::chrono::high_resolution_clock::now();
 
-            std::chrono::duration<double> elapsed = end - start;
+            // std::chrono::duration<double> elapsed = end - start;
 
-            cout << "Выполняется шаг: " << i << " время: " << elapsed.count() << endl;
+            // cout << "Выполняется шаг: " << i << " время: " << elapsed.count() << endl;
         }
 
         auto first_particle = init_vals.row(0);
