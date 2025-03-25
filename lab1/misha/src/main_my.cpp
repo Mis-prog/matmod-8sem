@@ -5,13 +5,14 @@
 #include <fstream>
 #include <iomanip>
 #include <filesystem>
+#include <string>
 
 #include "params.h"
 
 using namespace std;
 using namespace Eigen;
 
-const int M = 5e5;
+const int M = 1e6;
 const int N = 1e6;
 
 
@@ -42,18 +43,29 @@ int main() {
     MatrixXd init_vals(M, 2);
     init_vals.setZero();
 
-    filesystem::path dir = "../lab1/misha/result";
+    std::string M_str = std::to_string(M);
+    std::string N_str = std::to_string(N);
+    
+    if (M >= 1000) {
+        M_str = "1e" + std::to_string((int)log10(M));
+    }
+    if (N >= 1000) {
+        N_str = "1e" + std::to_string((int)log10(N));
+    }
+
+    // Формируем путь
+    std::filesystem::path dir = "../lab1/misha/result-" + M_str + "×" + N_str;
     if (filesystem::create_directory(dir)) {
         std::cout << "Папка создана: " << dir << std::endl;
     }
-    std::ofstream out_calc("../lab1/misha/result/calc.csv"), out_first_particle(
-            "../lab1/misha/result/first_particle.csv"), out_last_vals("../lab1/misha/result/last_vals.csv");
+    std::ofstream out_calc(dir / "calc.csv"), out_first_particle(
+            dir / "first_particle.csv"), out_last_vals(dir / "last_vals.csv");
     out_calc << "N <x> <y> <R> <x^2> <y^2> <Δx^2> <Δy^2> <ΔR^2>" << std::endl;
 
     out_first_particle << "x y" << endl;
     out_last_vals << "x y" << endl;
 
-    // auto start = std::chrono::high_resolution_clock::now();
+    auto start = std::chrono::high_resolution_clock::now();
 
     for (int i = 1; i < N; i++) {
         VectorXd curr_l(M);
@@ -70,8 +82,18 @@ int main() {
 
         init_vals += curr_l.asDiagonal() * curr_dirs.cast<double>();
 
+        if (i == 1){
+            VectorXd result = calc(init_vals);
+            auto end = std::chrono::high_resolution_clock::now();
 
-        if (i == 1 || i % 500 == 0) {
+            std::chrono::duration<double> elapsed = end - start;
+            double hours = elapsed.count() * N / 3600.0;
+
+            cout << "Всего будет считать: " << hours << " часов\nДля M×N: " << M << " " << N << "\n------------------\n";
+        }
+
+
+        if (i < 500 || i % 500 == 0) {
             VectorXd result = calc(init_vals);
 
             out_calc << i << " ";
