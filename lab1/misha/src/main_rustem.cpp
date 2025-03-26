@@ -17,15 +17,10 @@ double generate_random() {
 }
 int main()
 {
-    filesystem::path dir = "../lab1/misha/result";
-    if (filesystem::create_directory(dir)) {
-        std::cout << "Папка создана: " << dir << std::endl;
-    }
-
     auto start = std::chrono::high_resolution_clock::now();
 
     srand(time(NULL));
-    int m = 5e5;
+    int m = 3e5;
     int n = 1e6;
     vector<double> x(m, 0);
     vector<double> y(m, 0);
@@ -56,7 +51,18 @@ int main()
         dy[t] = sqy[t] - avy[t] * avy[t];
         r[t] = sqrt(avx[t] * avx[t] + avy[t] * avy[t]);
         dr[t] = dx[t] + dy[t];
-        if (t%1000==0){
+
+        if (t == 1){
+            auto end = std::chrono::high_resolution_clock::now();
+
+            std::chrono::duration<double> elapsed = end - start;
+            double hours = elapsed.count() * n / 3600.0;
+
+            cout << "Всего будет считать: " << hours << " часов\nДля M×N: " << m << " " << n << "\n------------------\n";
+        }
+
+
+        if (t % 1000==0){
             auto end = std::chrono::high_resolution_clock::now();
 
             std::chrono::duration<double> elapsed = end - start;
@@ -66,19 +72,34 @@ int main()
         }
     }
 
+    std::string M_str = std::to_string(m);
+    std::string N_str = std::to_string(n);
+    
+    if (m >= 1000) {
+        M_str = "1e" + std::to_string((int)log10(m));
+    }
+    if (n >= 1000) {
+        N_str = "1e" + std::to_string((int)log10(n));
+    }
+
+    // Формируем путь
+    std::filesystem::path dir = "../lab1/misha/result-" + M_str + "×" + N_str;
+    if (filesystem::create_directory(dir)) {
+        std::cout << "Папка создана: " << dir << std::endl;
+    }
     
 
-    ofstream f("../lab1/misha/result/trajectory.txt");
+    ofstream f(dir / "trajectory.txt");
     for (int i = 0; i < tx.size(); i++) {
         f << tx[i] << " " << ty[i] << endl;
     }
     f.close();
-    ofstream f2("../lab1/misha/result/result.txt");
+    ofstream f2(dir / "result.txt");
     for (int i = 0; i < x.size(); i++) {
         f2 << x[i] << " " << y[i] << endl;
     }
     f2.close();
-    ofstream f1("../lab1/misha/result/other.txt");
+    ofstream f1(dir / "other.txt");
     for (int t = 0; t < avx.size(); t++) {
         f1 << avx[t] << " " << avy[t] << " " << sqx[t] << " " << sqy[t] << " " << dx[t] << " " << dy[t] << " " << r[t] << " " << dr[t]<<endl;
     }
