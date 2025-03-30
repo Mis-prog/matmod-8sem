@@ -8,9 +8,9 @@
 #include <vector>
 #define Pi 3.1415926535
 using namespace std;
-int Nx = 100;
-int Nl = 1000;
-int Ny = 100;
+int Nx = 1000;
+int Nl = 3000;
+int Ny = 1000;
 double L = 1.0;
 double Lpml = 0.5;
 double k = 20;
