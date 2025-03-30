@@ -8,9 +8,9 @@
 #include <vector>
 #define Pi 3.1415926535
 using namespace std;
-int Nx = 400;
+int Nx = 100;
 int Nl = 1000;
-int Ny = 400;
+int Ny = 100;
 double L = 1.0;
 double Lpml = 0.5;
 double k = 20;
@@ -27,7 +27,7 @@ double Fz(double y)
     else return 0;
 }
 
-complex<double> gamma(double x)
+complex<double> _gamma(double x)
 {
     return 1.0 + complex<double>(0, 1) / k * pow((x - L) / Lpml, 2) * 20.0;
 }
@@ -97,8 +97,8 @@ int main()
             for (int j = 1; j < Ny; j++)
             {
                 double x = L + i * hx;
-                complex<double> c1 = 1.0 / (gamma(x) * gamma(x));
-                complex<double> c2 = dgamma(x) / (gamma(x) * gamma(x) * gamma(x));
+                complex<double> c1 = 1.0 / (_gamma(x) * _gamma(x));
+                complex<double> c2 = dgamma(x) / (_gamma(x) * _gamma(x) * _gamma(x));
                 double a = c1.real();
                 double b = c1.imag();
                 double c = c2.real();
