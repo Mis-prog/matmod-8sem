@@ -1,28 +1,25 @@
-#include<Eigen/Dense>
-#include<Eigen/Core>
-#include <Eigen/Sparse>
-#include <unsupported/Eigen/IterativeSolvers>
-#include <iostream>
-#include <fstream>
-#include <complex>
-#include <vector>
-#include <fstream>
-#include <sstream>
-#include <iomanip>
-#define Pi 3.1415926535
-const int Nx = 500;
-// const int Nl = 1000;
-const int Ny = 500;
-const double L = 1.0;
-const double Lpml = 0.5;
-const double k = 15;
-const double eps = 1e-1;
-const double ynull = 0.5;
+#include "main_lib.h"
 
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/SparseCore/SparseMatrix.h"
+#include "Eigen/src/SparseCore/SparseUtil.h"
+#include "Eigen/src/SparseLU/SparseLU.h"
 
 using namespace std;
 
-double Fz(double y)
+
+LIB::LIB(int Nx, int Ny, double L, double Lpml, double ynull, double k, double eps)
+{
+    this->Nx = Nx;
+    this->Ny = Ny;
+    this->L = L;
+    this->Lpml = Lpml;
+    this->ynull = ynull;
+    this->k = k;
+    this->eps = eps;
+}
+
+double LIB::Fz(double y)
 {
     double z = y;
     if (abs(z) <= 2)
@@ -33,32 +30,33 @@ double Fz(double y)
     else return 0;
 }
 
-complex<double> _gamma(double x)
+complex<double> LIB::_gamma(double x)
 {
     return 1.0 + complex<double>(0, 1) / k * pow((x - L) / Lpml, 2) * 20.0;
 }
 
-complex<double> dgamma(double x)
+complex<double> LIB::dgamma(double x)
 {
     return complex<double>(0, 1) / k * pow((x - L) / Lpml, 1) * 2.0 / Lpml * 20.0;
 }
 
-double fi(double y)
+double LIB::fi(double y)
 {
     return y * (1 - y) * (0.5 - y) * (0.5 - y);
 }
 
-int id(int i, int j)
+int LIB::id(int i, int j)
 {
     return i * (Ny + 1) + j;
 }
 
-int id(int i, int j, int l)
+int LIB::id(int i, int j, int l)
 {
     return (Nx + 1) * (Ny + 1) + 2 * i * (Ny + 1) + j + l * (Ny + 1);
 }
 
-int main()
+
+int LIB::calc()
 {
     double hy = 1.0 / Ny;
     double hx = L / Nx;
@@ -103,7 +101,8 @@ int main()
             {
                 double x = L + i * hx;
                 complex<double> c1 = 1.0 / (_gamma(x) * _gamma(x));
-                complex<double> c2 = dgamma(x) / (_gamma(x) * _gamma(x) * _gamma(x));
+                complex<double> c2 = dgamma(x) / (_gamma(x) * _gamma(x) *
+                    _gamma(x));
                 double a = c1.real();
                 double b = c1.imag();
                 double c = c2.real();
@@ -111,8 +110,9 @@ int main()
                 int id1 = id(i, j, 0);
                 int id2 = id(i, j, 1);
                 triplets.push_back(Eigen::Triplet<double>(id1, id(i, j, 0),
-                                                          (-2 * a / (hx * hx) - 2 / (hy * hy) + k * k * (1 + eps * fi(
-                                                              j * hy)))));
+                                                          (-2 * a / (hx * hx) - 2 / (hy * hy) + k * k * (1 + eps *
+                                                              fi(
+                                                                  j * hy)))));
                 triplets.push_back(Eigen::Triplet<double>(id1, id(i - 1, j, 0), (a / (hx * hx) + c / (2 * hx))));
                 triplets.push_back(Eigen::Triplet<double>(id1, id(i + 1, j, 0), (a / (hx * hx) - c / (2 * hx))));
                 triplets.push_back(Eigen::Triplet<double>(id1, id(i, j - 1, 0), (1 / (hy * hy))));
@@ -125,16 +125,21 @@ int main()
                 if (i > 1)
                 {
                     triplets.push_back(Eigen::Triplet<double>(id2, id(i, j, 1),
-                                                              (-2 * a / (hx * hx) - 2 / (hy * hy) + k * k * (1 + eps *
+                                                              (-2 * a / (hx * hx) - 2 / (hy * hy) + k * k * (1 + eps
+                                                                  *
                                                                   fi(j * hy)))));
-                    triplets.push_back(Eigen::Triplet<double>(id2, id(i - 1, j, 1), (a / (hx * hx) + c / (2 * hx))));
-                    triplets.push_back(Eigen::Triplet<double>(id2, id(i + 1, j, 1), (a / (hx * hx) - c / (2 * hx))));
+                    triplets.push_back(
+                        Eigen::Triplet<double>(id2, id(i - 1, j, 1), (a / (hx * hx) + c / (2 * hx))));
+                    triplets.push_back(
+                        Eigen::Triplet<double>(id2, id(i + 1, j, 1), (a / (hx * hx) - c / (2 * hx))));
                     triplets.push_back(Eigen::Triplet<double>(id2, id(i, j - 1, 1), (1 / (hy * hy))));
                     triplets.push_back(Eigen::Triplet<double>(id2, id(i, j + 1, 1), (1 / (hy * hy))));
                     //////
                     triplets.push_back(Eigen::Triplet<double>(id2, id(i, j, 0), (-2 * b / (hx * hx))));
-                    triplets.push_back(Eigen::Triplet<double>(id2, id(i - 1, j, 0), (b / (hx * hx) + d / (2 * hx))));
-                    triplets.push_back(Eigen::Triplet<double>(id2, id(i + 1, j, 0), (b / (hx * hx) - d / (2 * hx))));
+                    triplets.push_back(
+                        Eigen::Triplet<double>(id2, id(i - 1, j, 0), (b / (hx * hx) + d / (2 * hx))));
+                    triplets.push_back(
+                        Eigen::Triplet<double>(id2, id(i + 1, j, 0), (b / (hx * hx) - d / (2 * hx))));
                 }
             }
         for (int j = 1; j < Ny; j++)

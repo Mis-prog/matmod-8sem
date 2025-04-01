@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-data = np.loadtxt('../result/result20y00.700000.txt')
+data = np.loadtxt('../result/result15y00.80.txt')
 y = data[:, 0]
 x = data[:, 1]
 values = data[:, 2]
@@ -22,9 +22,10 @@ fig = plt.figure(figsize=(12, 8))  # Размер окна
 ax = fig.add_subplot(111, projection='3d')
 
 # Рисуем поверхность
-surf = ax.plot_surface(X, Y, Z, cmap='seismic')
+surf = ax.plot_surface(X, Y, Z,  cmap='plasma')
 ax.set_xlabel('x')
 ax.set_ylabel('y')
+# ax.set_zlim(0, 1)
 ax.view_init(azim=225, elev=30)
 
 plt.show()
