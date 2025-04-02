@@ -20,6 +20,7 @@ int main()
     // int Ny = ceil(Ly / hy);
     vector<vector<double>> u(Nx, vector<double>(Ny, 0));
     vector<vector<double>> v(Nx, vector<double>(Ny, 0));
+    vector<pair<double,double>> y_regional;
 
     for (int j = 0; j < Ny; j++)
     {
@@ -33,6 +34,7 @@ int main()
 
     cout << endl;
 
+    bool found = false;
     for (int i = 1; i < Nx; i++)
     {
         for (int j = 1; j < Ny - 1; j++)
@@ -58,11 +60,19 @@ int main()
                     - hy2 * hy2 / (hy1 * hy2 * (hy1 + hy2)) * u[i - 1][j - 1]
                     + u[i - 1][j] * (hy2 * hy2 - hy1 * hy1) / (hy1 * hy2 * (hy1 + hy2)));
             v[i][j] = v[i][j - 1] - hy1 / hx * (u[i][j - 1] - u[i - 1][j - 1]);
+
+            const double epsilon = 1e-6; 
+            if (std::abs(u[i][j] - v0_x) < epsilon  && !found){
+                // cout << "i: " << i << " j: " << j << " " << u[i][j] << endl;
+                y_regional.push_back({i*hx, y_j});
+                found = true;
+            }
         }
+        found = false;
         // cout << i << endl;
     }
 
-    ofstream fout_U("../lab4/misha/result/results_u.txt"), fout_V("../lab4/misha/result/results_v.txt");
+    ofstream fout_U("../lab4/misha/result/results_u.txt"), fout_V("../lab4/misha/result/results_v.txt"), fout_regional("../lab4/misha/result/regional.txt");
     for (int j = 0; j < Ny; j+=2)
     {
         for (int i = 0; i < Nx; i+=2)
@@ -73,6 +83,10 @@ int main()
         fout_V << endl;
         fout_U << endl;
     }
+    for (auto value : y_regional){
+        fout_regional << value.first << " " << value.second << endl;
+    }
+    fout_regional.close();
     fout_U.close();
     fout_V.close();
     cout << "! Готово !" << endl;
