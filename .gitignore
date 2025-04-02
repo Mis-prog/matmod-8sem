@@ -5,3 +5,4 @@ build/
 out/
 .vs/
 .ipynb_checkpoints/
+.vscode/

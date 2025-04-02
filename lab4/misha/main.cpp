@@ -2,21 +2,24 @@
 #include <vector>
 #include <cmath>
 #include <fstream>
+#include <iomanip> 
 
 using namespace std;
 
-constexpr int Lx = 10, Ly = 10, Ny = 10000;
+constexpr int Lx = 2, Ly = 1, Ny = 5000;
 constexpr double hx = 0.0001;
 constexpr double density = 725.0, dynamic_viscosity = 0.53e-3;
 constexpr double nu = dynamic_viscosity / density;
 constexpr double v0_x = 2;
-constexpr double fou = M_E;
+constexpr double fou = 10;
 
 int main()
 {
     int Nx = ceil(Lx / hx);
-    vector<vector<double>> u(Nx, vector<double>(Ny));
-    vector<vector<double>> v(Nx, vector<double>(Ny));
+    // double hy = 0.0001;
+    // int Ny = ceil(Ly / hy);
+    vector<vector<double>> u(Nx, vector<double>(Ny, 0));
+    vector<vector<double>> v(Nx, vector<double>(Ny, 0));
 
     for (int j = 0; j < Ny; j++)
     {
@@ -40,7 +43,11 @@ int main()
 
             double hy1 = y_j - y_j_left;
             double hy2 = y_j_right - y_j;
-
+            // double hy1 = 0.0001;
+            // double hy2 = 0.0001;
+            // cout << fixed << setprecision(20) <<  y_j_left << " " << y_j << " "  << y_j_right <<  endl;
+            // cout << fixed << setprecision(20) <<  hy1 << " " << hy2 << endl;
+            //             double hy1 = 0.1, hy2 = 0.1;
             u[i][j] = u[i - 1][j]
                 + hx / u[i - 1][j] *
                 (2 * nu / (hy2 * (hy1 + hy2)) * u[i - 1][j + 1]
@@ -52,16 +59,22 @@ int main()
                     + u[i - 1][j] * (hy2 * hy2 - hy1 * hy1) / (hy1 * hy2 * (hy1 + hy2)));
             v[i][j] = v[i][j - 1] - hy1 / hx * (u[i][j - 1] - u[i - 1][j - 1]);
         }
+        // cout << i << endl;
     }
 
-    ofstream fout("../lab4/misha/result/results.txt");
-    for (int j = 0; j < Ny; j++)
+    ofstream fout_U("../lab4/misha/result/results_u.txt"), fout_V("../lab4/misha/result/results_v.txt");
+    for (int j = 0; j < Ny; j+=2)
     {
-        for (int i = 0; i < Nx; i++)
+        for (int i = 0; i < Nx; i+=2)
         {
-            fout << u[i][j] << " ";
+            fout_U << u[i][j] << " ";
+            fout_V << v[i][j] << " ";
         }
-        fout << endl;
+        fout_V << endl;
+        fout_U << endl;
     }
-    fout.close();
+    fout_U.close();
+    fout_V.close();
+    cout << "! Готово !" << endl;
+    return 0;
 }
