@@ -4,15 +4,34 @@ from mpl_toolkits.mplot3d import Axes3D
 
 filename = 'result/results.txt'
 
-data = np.loadtxt(filename)
+data = []
+with open(filename, 'r') as f:
+    for line in f:
+        # Преобразуем каждую строку в список чисел
+        data.append([float(x) for x in line.split()])
 
-x = np.linspace(0, 10, data.shape[1])
-y = np.linspace(0, 1, data.shape[0])
+data = np.array(data)
+
+# Генерация координат сетки
+Nx, Ny = data.shape
+
+# Создаем сетку координат (x, y)
+x = np.linspace(0, 1, Nx)
+y = np.linspace(0, 1, Ny)
+
+
 X, Y = np.meshgrid(x, y)
 
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-ax.plot_surface(X, Y, data)
-ax.set_xlabel('X')
-ax.set_ylabel('Y')
+
+U = data
+V = np.zeros_like(U)
+
+plt.figure(figsize=(10, 6))
+step = 200
+plt.quiver(X[::step, ::step], Y[::step, ::step], U[::step, ::step], V[::step, ::step], scale=10, color='blue')
+
+
+plt.title('Векторное поле скорости')
+plt.xlabel('Индекс по оси x')
+plt.ylabel('Индекс по оси y')
 plt.show()
