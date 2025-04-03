@@ -37,14 +37,15 @@ x_vals = np.linspace(0 , 2, Nx)
 y_vals = []
 
 fou, Ly = 10, 1
-for j in range( Ny):
+for j in range(Ny):
     y_vals.append((fou ** (j * Ly / Ny  - Ly) )/ (fou - 1))
 y_vals = np.array(y_vals)
 
 X, Y = np.meshgrid(x_vals, y_vals)
-ETA = Y / np.sqrt(nu * X / U_inf + 1e-9)
+ETA = Y * np.sqrt(U_inf /(nu * X + 1e-9))
 
-u = U_inf * np.interp(ETA, eta_vals, f_prime_vals) 
-v = 0.5 * np.sqrt(nu*U_inf/X) * (ETA *  np.interp(ETA,eta_vals,f_prime_vals) -  np.interp(ETA, eta_vals, f_vals))
-
-print(u[0])
+for layer in ETA:
+    y0 = [0, 0, fpp0_opt]
+    sol = solve_ivp(blasius_eq,(min(layer),max(layer)),y0,t_eval=sorted(layer), method='RK45')
+# y0 = [0, 0, fpp0_opt]
+# sol = solve_ivp(blasius_eq,(0, 1000),y0,t_eval=ETA.flatten(), method='RK45')
