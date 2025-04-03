@@ -1,35 +1,66 @@
-import random
+
 import numpy as np
-import time
-import os
 import pygame
 import sys
+import os
 
 
-class GameLife:
+class GameLife2:
     def __init__(self, distribution_ratio, size):
         self.size = size
         self.distribution_ratio = distribution_ratio
-        self.generation = self.get_zero_generation(distribution_ratio, size)
+        self.generation = self.get_cycle_generation(distribution_ratio, size)
 
-    def get_zero_generation(self, distribution_ratio, size):
-        rand = random.Random()
-        return_matrix = np.zeros((size, size), dtype=int)
+    def get_cycle_generation(self, distribution_ratio, size):
+        # Создаём пустое поле
+        generation = np.zeros((size, size), dtype=int)
 
-        # Рассчитываем количество живых клеток
-        amount_cell = round(size * size * distribution_ratio)
+        # Квадрат (3-8 строки, 3-8 столбцы, без диагонали)
+        for i in range(3, 9):
+            for j in range(3, 9):
+                if i != j:
+                    generation[i, j] = 1
+        generation[3, 8] = 0
+        generation[4, 7] = 0
+        generation[5, 6] = 0
+        generation[6, 5] = 0
+        generation[7, 4] = 0
+        generation[8, 3] = 0
 
-        # Размещаем живые клетки случайным образом
-        for i in range(amount_cell):
-            value = rand.randint(0, size * size - 1)
-            return_matrix[value // size, value % size] = 1
+        # Крест (3-10 строки, 20-27 столбцы)
+        generation[3, 20:28] = [0, 0, 1, 1, 1, 1, 0, 0]
+        generation[4, 20:28] = [0, 0, 1, 0, 0, 1, 0, 0]
+        generation[5, 20:28] = [1, 1, 1, 0, 0, 1, 1, 1]
+        generation[6, 20:28] = [1, 0, 0, 0, 0, 0, 0, 1]
+        generation[7, 20:28] = [1, 0, 0, 0, 0, 0, 0, 1]
+        generation[8, 20:28] = [1, 1, 1, 0, 0, 1, 1, 1]
+        generation[9, 20:28] = [0, 0, 1, 0, 0, 1, 0, 0]
+        generation[10, 20:28] = [0, 0, 1, 1, 1, 1, 0, 0]
 
-        return return_matrix
+        # Круги (3-15 строки, 40-52 столбцы)
+        generation[3, 40:53] = [0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0]
+        generation[4, 40:53] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        generation[5, 40:53] = [1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1]
+        generation[6, 40:53] = [1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1]
+        generation[7, 40:53] = [1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1]
+        generation[8, 40:53] = [0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0]
+        generation[9, 40:53] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        generation[10, 40:53] = [0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0]
+        generation[11, 40:53] = [1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1]
+        generation[12, 40:53] = [1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1]
+        generation[13, 40:53] = [1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1]
+        generation[14, 40:53] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        generation[15, 40:53] = [0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0]
+
+        # Семафор (3 строка, 60-62 столбцы)
+        generation[3, 60:63] = [1, 1, 1]
+
+        return generation
 
     def update_generation(self):
         new_generation = np.zeros((self.size, self.size), dtype=int)
 
-        # Обработка углов
+        # Углы
         new_generation[0, 0] = self.new_cell(self.generation[0, 0],
                                              self.generation[0, 1],
                                              self.generation[1, 0],
@@ -50,7 +81,7 @@ class GameLife:
                                                                      self.generation[self.size - 1, self.size - 2],
                                                                      self.generation[self.size - 2, self.size - 1])
 
-        # Обработка границ (не углов)
+        # Границы (не углы)
         for i in range(1, self.size - 1):
             new_generation[0, i] = self.new_cell(self.generation[0, i],
                                                  self.generation[0, i - 1],
@@ -80,7 +111,7 @@ class GameLife:
                                                              self.generation[i - 1, self.size - 2],
                                                              self.generation[i + 1, self.size - 2])
 
-        # Обработка внутренних клеток
+        # Внутренние клетки
         for i in range(1, self.size - 1):
             for j in range(1, self.size - 1):
                 new_generation[i, j] = self.new_cell(self.generation[i, j],
@@ -101,17 +132,14 @@ class GameLife:
 
         if current_cell == 1 and (sum_cells > 3 or sum_cells < 2):
             return_value = 0
-
-        if current_cell == 0 and sum_cells == 3:
+        elif current_cell == 0 and sum_cells == 3:
             return_value = 1
 
         return return_value
 
     def current_generation_to_string(self):
         active_cells = 0
-        passive_cells = 0
         dead_cells = 0
-
         result = []
         for i in range(self.size):
             row = []
@@ -123,8 +151,8 @@ class GameLife:
                     row.append(' ')
                     dead_cells += 1
             result.append(''.join(row))
+        return '\n'.join(result), active_cells, 0, dead_cells
 
-        return '\n'.join(result), active_cells, passive_cells, dead_cells
 
 if not os.path.exists("result/frames_gamelife"):
     os.makedirs("result/frames_gamelife")
@@ -132,28 +160,25 @@ if not os.path.exists("result/frames_gamelife"):
 
 def main():
     frame_count = 0
-    CELL_SIZE = 15  # Размер клетки в пикселях
-    GRID_COLOR = (50, 50, 50)  # Цвет сетки
-    ALIVE_COLOR = (255, 255, 255)  # Цвет живых клеток
-    DEAD_COLOR = (0, 0, 0)  # Цвет мертвых клеток
+    CELL_SIZE = 10  # Уменьшил размер клеток, чтобы всё уместилось
+    GRID_COLOR = (50, 50, 50)
+    ALIVE_COLOR = (255, 255, 255)
+    DEAD_COLOR = (0, 0, 0)
     BACKGROUND_COLOR = (10, 10, 10)
     FPS = 10
 
-    size = 32
+    size = 64  # Увеличил размер поля, чтобы вместить все структуры
     distribution_ratio = 0.3
 
     width = size * CELL_SIZE
     height = size * CELL_SIZE
 
-    # Инициализация pygame
     pygame.init()
     screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
-    pygame.display.set_caption("Игра 'Жизнь'")
+    pygame.display.set_caption("Игра 'Жизнь' (GameLife2)")
     clock = pygame.time.Clock()
-    font = pygame.font.SysFont(None, 24)
 
-    # Создаем игру
-    game = GameLife(distribution_ratio, size)
+    game = GameLife2(distribution_ratio, size)
 
     running = True
     paused = False
@@ -169,52 +194,35 @@ def main():
                 elif event.key == pygame.K_SPACE:
                     paused = not paused
                 elif event.key == pygame.K_r:
-                    game = GameLife(distribution_ratio, size)
+                    game = GameLife2(distribution_ratio, size)
                     generation_count = 0
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                # Инвертирование клетки при клике
                 x, y = pygame.mouse.get_pos()
                 grid_x, grid_y = x // CELL_SIZE, y // CELL_SIZE
                 if 0 <= grid_x < size and 0 <= grid_y < size:
                     game.generation[grid_y, grid_x] = 1 - game.generation[grid_y, grid_x]
 
-        # Обновление поколения, если игра не на паузе
         if not paused:
             game.update_generation()
             generation_count += 1
 
-        # Очистка экрана
         screen.fill(BACKGROUND_COLOR)
 
-        # Отрисовка клеток
         for y in range(size):
             for x in range(size):
                 cell_rect = pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
-
-                # Рисуем клетку
                 cell_color = ALIVE_COLOR if game.generation[y, x] == 1 else DEAD_COLOR
                 pygame.draw.rect(screen, cell_color, cell_rect)
-
-                # Рисуем границу клетки
                 pygame.draw.rect(screen, GRID_COLOR, cell_rect, 1)
 
-        # Получаем статистику
-        _, active_cells, passive_cells, dead_cells = game.current_generation_to_string()
-
-        # Отображаем информацию
+        _, active_cells, _, dead_cells = game.current_generation_to_string()
         info_text = f"Поколение: {generation_count} | Живые: {active_cells} | Мертвые: {dead_cells}"
-        # info_text += " | [ПАУЗА]" if paused else ""
-        # info_text += " | ПРОБЕЛ: пауза | R: рестарт | ESC: выход | КЛИК: изменить клетку"
-
-        # Отображаем информацию в заголовке окна
         pygame.display.set_caption(info_text)
 
-        # Обновляем экран
         pygame.display.flip()
 
-        pygame.image.save(screen, f"result/frames_gamelife/frame_{frame_count}.png")
+        # pygame.image.save(screen, f"result/frames_gamelife/frame_{frame_count}.png")
         frame_count += 1
-        # Ограничиваем FPS
         clock.tick(FPS)
 
     pygame.quit()

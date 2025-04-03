@@ -9,9 +9,11 @@ ROWS = 128
 
 WIN = pygame.display.set_mode((WIDTH, WIDTH), pygame.RESIZABLE)
 
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-YELLOW = (107, 142, 35)
+# Новые цвета для чёрного стиля
+WHITE = (255, 255, 255)  # Для активных клеток
+BLACK = (0, 0, 0)        # Фон
+GRID_COLOR = (50, 50, 50)  # Цвет сетки (серый для контраста)
+YELLOW = (255, 215, 0)   # Активные клетки (золотистый вместо оливкового)
 A = 0.3
 P = 3
 T = 5
@@ -32,16 +34,16 @@ class Node:
         self.tick = tick
         self.actLevel = level
         self.livetime = livetime
-        self.colour = WHITE
+        self.colour = BLACK  # По умолчанию чёрный (фон)
         self.occupied = None
 
     def draw(self, WIN):
-        pygame.draw.rect(WIN, self.colour, (self.x, self.y, WIDTH / 8, WIDTH / 8))
+        pygame.draw.rect(WIN, self.colour, (self.x, self.y, WIDTH / ROWS, WIDTH / ROWS))
 
 
 def make_grid(rows, width):
     grid = []
-    gap = WIDTH // rows
+    gap = width // rows
     print(gap)
     for i in range(rows):
         grid.append([])
@@ -52,6 +54,7 @@ def make_grid(rows, width):
 
 
 def update_display(win, grid, rows, width):
+    win.fill(BLACK)  # Заполняем фон чёрным
     for row in grid:
         for spot in row:
             spot.draw(win)
@@ -61,7 +64,7 @@ def update_display(win, grid, rows, width):
 
 def make_cells(rows, width):
     cells = []
-    gap = WIDTH // rows
+    gap = width // rows
     print(gap)
     for i in range(rows):
         cells.append([])
@@ -73,9 +76,9 @@ def make_cells(rows, width):
 def draw_grid(win, rows, width):
     gap = width // ROWS
     for i in range(rows):
-        pygame.draw.line(win, BLACK, (0, i * gap), (width, i * gap))
+        pygame.draw.line(win, GRID_COLOR, (0, i * gap), (width, i * gap))
         for j in range(rows):
-            pygame.draw.line(win, BLACK, (j * gap, 0), (j * gap, width))
+            pygame.draw.line(win, GRID_COLOR, (j * gap, 0), (j * gap, width))
 
 
 def Find_Node(pos, WIDTH):
@@ -88,10 +91,9 @@ def Find_Node(pos, WIDTH):
 
 def neighbour(tile):
     col, row = tile.col, tile.row
-    # print(row, col)
     neighbours = [[row - 1, col - 1], [row - 1, col], [row - 1, col + 1],
                   [row, col - 1], [row, col + 1],
-                  [row + 1, col - 1], [row + 1, col], [row + 1, col + 1], ]
+                  [row + 1, col - 1], [row + 1, col], [row + 1, col + 1]]
     actual = []
     for i in neighbours:
         row, col = i
@@ -109,7 +111,6 @@ def update_grid(oldgrid, time):
 
     for row in newgrid:
         for tile in row:
-
             if oldgrid[tile.row][tile.col].colour == WHITE:
                 tile.actLevel *= A
                 neighbours = neighbour(oldgrid[tile.row][tile.col])
@@ -125,7 +126,6 @@ def update_grid(oldgrid, time):
 
             if oldgrid[tile.row][tile.col].colour == BLACK:
                 tile.actLevel *= A
-
                 if oldgrid[tile.row][tile.col].tick == time:
                     tile.colour = WHITE
                     tile.tick = 0
@@ -139,38 +139,6 @@ def update_grid(oldgrid, time):
                     tile.actLevel = 1
                     tile.colour = YELLOW
 
-            # oldgrid[tile.row][tile.col].livetime -= 1
-            # newgrid[tile.row][tile.col].livetime -= 1
-            # if oldgrid[tile.row][tile.col].colour == WHITE:
-            #     tile.actLevel *= A
-            #     neighbours = neighbour(oldgrid[tile.row][tile.col])
-            #     summ = oldgrid[tile.row][tile.col].actLevel
-            #     for i in neighbours:
-            #         row2, col2 = i
-            #         summ += oldgrid[row2][col2].actLevel
-
-            #     if summ >= P:
-            #         tile.colour = YELLOW
-            #         tile.livetime = T
-            #         tile.actLevel = 1
-
-            # if oldgrid[tile.row][tile.col].colour == BLACK:
-            #     tile.actLevel *= A
-
-            #     if oldgrid[tile.row][tile.col].livetime == 0:
-            #         tile.colour = WHITE
-            #         tile.livetime = 0
-
-            # if oldgrid[tile.row][tile.col].colour == YELLOW:
-            #     if oldgrid[tile.row][tile.col].livetime == 0:
-            #         tile.colour = BLACK
-            #         tile.tick = time + B
-            #         tile.actLevel *= A
-            #     else:
-            #         tile.actLevel = 1
-            #         tile.colour = YELLOW
-            #         tile.livetime -= 1
-
     return newgrid
 
 
@@ -178,13 +146,7 @@ run = True
 grid = make_grid(ROWS, WIDTH)
 time = 0
 
-# for i in range(len(grid) - 7, len(grid) - 5):
-#     for j in range(20,len(grid[0])-20):
-#         grid[i][j].colour = YELLOW
-#         grid[i][j].actLevel = 1
-#         grid[i][j].livetime = T
-#         grid[i][j].tick = T
-
+# Начальные условия
 for i in range(len(grid)):
     for j in range(len(grid[0]) - 7, len(grid[0]) - 6):
         grid[i][j].colour = YELLOW
@@ -200,10 +162,12 @@ for i in range(len(grid)):
         grid[i][j].tick = T
 
 while run:
-
     for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            run = False
         if event.type == pygame.MOUSEBUTTONDOWN:
             run = False
+
     pygame.time.delay(50)
 
     if time % 15 == 0:
@@ -216,9 +180,10 @@ while run:
 
     grid = update_grid(grid, time)
     update_display(WIN, grid, ROWS, WIDTH)
-    pygame.image.save(WIN, f"result/frames_neural/frame_{frame_count}.png")
+    # pygame.image.save(WIN, f"result/frames_neural/frame_{frame_count}.png")
     frame_count += 1
     print(time)
     time += 1
-    # run= False
-update_display(WIN, grid, ROWS, WIDTH)
+
+pygame.quit()
+sys.exit()
