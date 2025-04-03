@@ -3,5 +3,4 @@ project(matmod)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_subdirectory(lab1)
 add_subdirectory(lab3)

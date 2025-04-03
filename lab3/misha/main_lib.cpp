@@ -185,6 +185,8 @@ int LIB::calc()
         }
         s.setFromTriplets(triplets.begin(), triplets.end());
     }
+
+    cout << "\n! Система составлена !\n";
     Eigen::SparseLU<Eigen::SparseMatrix<double>> solver(s);
 
     if (solver.info() != Eigen::Success)
@@ -193,6 +195,7 @@ int LIB::calc()
     }
     Eigen::MatrixXd sol = solver.solve(f);
 
+    cout << "! Система решена !\n";
     std::ostringstream filename;
     filename << "../lab3/misha/result/result" << k << "y0" << std::fixed << std::setprecision(2) << ynull << ".txt";
     ofstream file(filename.str());

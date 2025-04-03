@@ -4,3 +4,5 @@ venv/
 build/
 out/
 .vs/
+.vscode/
+lab4/
