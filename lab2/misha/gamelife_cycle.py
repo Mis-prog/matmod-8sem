@@ -165,7 +165,7 @@ def main():
     ALIVE_COLOR = (255, 255, 255)
     DEAD_COLOR = (0, 0, 0)
     BACKGROUND_COLOR = (10, 10, 10)
-    FPS = 10
+    FPS = 1
 
     size = 64  # Увеличил размер поля, чтобы вместить все структуры
     distribution_ratio = 0.3

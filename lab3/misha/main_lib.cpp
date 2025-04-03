@@ -193,8 +193,8 @@ int LIB::calc()
     {
         cout << "Failed" << endl;
     }
+    cout << "\n! Система начала рещаться !\n";
     Eigen::MatrixXd sol = solver.solve(f);
-
     cout << "! Система решена !\n";
     std::ostringstream filename;
     filename << "../lab3/misha/result/result" << k << "y0" << std::fixed << std::setprecision(2) << ynull << ".txt";
