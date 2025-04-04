@@ -55,9 +55,9 @@ int LIB::id(int i, int j, int l)
     return (Nx + 1) * (Ny + 1) + 2 * i * (Ny + 1) + j + l * (Ny + 1);
 }
 
-
 int LIB::calc()
 {
+    
     double hy = 1.0 / Ny;
     double hx = L / Nx;
     int Nl = int(Lpml / hx);
@@ -101,8 +101,7 @@ int LIB::calc()
             {
                 double x = L + i * hx;
                 complex<double> c1 = 1.0 / (_gamma(x) * _gamma(x));
-                complex<double> c2 = dgamma(x) / (_gamma(x) * _gamma(x) *
-                    _gamma(x));
+                complex<double> c2 = dgamma(x) / (_gamma(x) * _gamma(x) * _gamma(x));
                 double a = c1.real();
                 double b = c1.imag();
                 double c = c2.real();
@@ -110,9 +109,8 @@ int LIB::calc()
                 int id1 = id(i, j, 0);
                 int id2 = id(i, j, 1);
                 triplets.push_back(Eigen::Triplet<double>(id1, id(i, j, 0),
-                                                          (-2 * a / (hx * hx) - 2 / (hy * hy) + k * k * (1 + eps *
-                                                              fi(
-                                                                  j * hy)))));
+                                                          (-2 * a / (hx * hx) - 2 / (hy * hy) + k * k * (1 + eps * fi(
+                                                              j * hy)))));
                 triplets.push_back(Eigen::Triplet<double>(id1, id(i - 1, j, 0), (a / (hx * hx) + c / (2 * hx))));
                 triplets.push_back(Eigen::Triplet<double>(id1, id(i + 1, j, 0), (a / (hx * hx) - c / (2 * hx))));
                 triplets.push_back(Eigen::Triplet<double>(id1, id(i, j - 1, 0), (1 / (hy * hy))));
@@ -125,21 +123,16 @@ int LIB::calc()
                 if (i > 1)
                 {
                     triplets.push_back(Eigen::Triplet<double>(id2, id(i, j, 1),
-                                                              (-2 * a / (hx * hx) - 2 / (hy * hy) + k * k * (1 + eps
-                                                                  *
+                                                              (-2 * a / (hx * hx) - 2 / (hy * hy) + k * k * (1 + eps *
                                                                   fi(j * hy)))));
-                    triplets.push_back(
-                        Eigen::Triplet<double>(id2, id(i - 1, j, 1), (a / (hx * hx) + c / (2 * hx))));
-                    triplets.push_back(
-                        Eigen::Triplet<double>(id2, id(i + 1, j, 1), (a / (hx * hx) - c / (2 * hx))));
+                    triplets.push_back(Eigen::Triplet<double>(id2, id(i - 1, j, 1), (a / (hx * hx) + c / (2 * hx))));
+                    triplets.push_back(Eigen::Triplet<double>(id2, id(i + 1, j, 1), (a / (hx * hx) - c / (2 * hx))));
                     triplets.push_back(Eigen::Triplet<double>(id2, id(i, j - 1, 1), (1 / (hy * hy))));
                     triplets.push_back(Eigen::Triplet<double>(id2, id(i, j + 1, 1), (1 / (hy * hy))));
                     //////
                     triplets.push_back(Eigen::Triplet<double>(id2, id(i, j, 0), (-2 * b / (hx * hx))));
-                    triplets.push_back(
-                        Eigen::Triplet<double>(id2, id(i - 1, j, 0), (b / (hx * hx) + d / (2 * hx))));
-                    triplets.push_back(
-                        Eigen::Triplet<double>(id2, id(i + 1, j, 0), (b / (hx * hx) - d / (2 * hx))));
+                    triplets.push_back(Eigen::Triplet<double>(id2, id(i - 1, j, 0), (b / (hx * hx) + d / (2 * hx))));
+                    triplets.push_back(Eigen::Triplet<double>(id2, id(i + 1, j, 0), (b / (hx * hx) - d / (2 * hx))));
                 }
             }
         for (int j = 1; j < Ny; j++)
@@ -185,17 +178,16 @@ int LIB::calc()
         }
         s.setFromTriplets(triplets.begin(), triplets.end());
     }
-
-    cout << "\n! Система составлена !\n";
+    cout << "Система составлена" << endl;
     Eigen::SparseLU<Eigen::SparseMatrix<double>> solver(s);
-
     if (solver.info() != Eigen::Success)
     {
         cout << "Failed" << endl;
     }
-    cout << "\n! Система начала рещаться !\n";
     Eigen::MatrixXd sol = solver.solve(f);
-    cout << "! Система решена !\n";
+
+    cout << "Система решена" << endl;
+
     std::ostringstream filename;
     filename << "../lab3/misha/result/result" << k << "y0" << std::fixed << std::setprecision(2) << ynull << ".txt";
     ofstream file(filename.str());

@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-data = np.loadtxt('../result/result15y00.80.txt')
+data = np.loadtxt('../result/result40y00.50.txt')
 y = data[:, 0]
 x = data[:, 1]
 values = data[:, 2]
@@ -28,4 +28,7 @@ ax.set_ylabel('y')
 # ax.set_zlim(0, 1)
 ax.view_init(azim=225, elev=30)
 
+plt.show()
+
+plt.plot(x,values)
 plt.show()

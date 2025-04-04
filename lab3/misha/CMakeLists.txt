@@ -8,7 +8,7 @@ target_include_directories(
 )
 
 add_executable(lab3_misha main_test.cpp)
-target_compile_options(lab3_misha PRIVATE -O3 -march=native)
+target_compile_options(lab3_misha PRIVATE -O3 -march=native -flto -ffast-math -funroll-loops)
 target_link_libraries(lab3_misha PRIVATE lab3_misha_lib)
 target_include_directories(
         lab3_misha
