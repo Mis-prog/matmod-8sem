@@ -1,51 +1,75 @@
 import numpy as np
-import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
+import matplotlib.pyplot as plt
+from tqdm import tqdm
 
 def blasius_eq(eta, y):
-    f, f_prime, f_double_prime = y
-    f_triple_prime = - (f * f_double_prime) / 2  # Исходное уравнение
-    return [f_prime, f_double_prime, f_triple_prime]
+    f, fp, fpp = y
+    fppp = -0.5 * f * fpp
+    return [fp, fpp, fppp]
 
-def shoot(fpp0_guess, eta_max=10, n_points=100):
+def shoot(fpp0_guess, eta_max=10, n_points=500):
     eta_vals = np.linspace(0, eta_max, n_points)
-    y0 = [0, 0, fpp0_guess]  # Начальные условия: f(0)=0, f'(0)=0, f''(0)=предположение
-    sol = solve_ivp(blasius_eq, [0, eta_max], y0, t_eval=eta_vals, method='RK45')
-    return sol.t, sol.y
+    y0 = [0, 0, fpp0_guess]  # f(0)=0, f'(0)=0, f''(0)=fpp0_guess
+    sol = solve_ivp(blasius_eq, [0, eta_max], y0, t_eval=eta_vals)
+    return eta_vals, sol.y
 
-def find_optimal_fpp0(target_f_prime_inf=1, tol=1e-5, eta_max=10, n_points=100):
-    fpp0_low, fpp0_high = 0.1, 1.0  # Начальный диапазон для f''(0)
-    while fpp0_high - fpp0_low > tol:
-        fpp0_guess = (fpp0_low + fpp0_high) / 2
-        eta_vals, (f_vals, f_prime_vals, _) = shoot(fpp0_guess, eta_max, n_points)
-        
-        if f_prime_vals[-1] < target_f_prime_inf:
-            fpp0_low = fpp0_guess  # Недооценили f''(0), надо больше
+def find_optimal_fpp0(target_fp_inf=1.0, tol=1e-6):
+    low, high = 0.3, 0.35
+    while high - low > tol:
+        mid = (low + high) / 2
+        eta_vals, (f, fp, fpp) = shoot(mid)
+        if fp[-1] < target_fp_inf:
+            low = mid
         else:
-            fpp0_high = fpp0_guess  # Переоценили, надо меньше
-    
-    return (fpp0_low + fpp0_high) / 2
+            high = mid
+    return (low + high) / 2
 
-fpp0_opt = find_optimal_fpp0() 
-eta_vals, (f_vals, f_prime_vals, f_double_prime_vals) = shoot(fpp0_opt)
+fpp0_opt = find_optimal_fpp0()
+eta_vals, (f, fp, fpp) = shoot(fpp0_opt)
 
-print()
 
-# nu = 0.53e-3 / 725     
-# U_inf = 2
+U = 2
+mu = 0.53e-3
+rho = 725
+nu = mu / rho
 
-# Nx, Ny = 20000, 5000
-# x_vals = np.linspace(0 , 2, Nx)  
-# y_vals = []
+def eta_func(y, x):
+    return y * np.sqrt(U / (nu * x + 1e-9))
 
-# fou, Ly = 10, 1
-# for j in range(Ny):
-#     y_vals.append((fou ** (j * Ly / Ny  - Ly) )/ (fou - 1))
-# y_vals = np.array(y_vals)
+def u_velocity(eta):
+    return U * np.interp(eta, eta_vals, fp)
 
-# X, Y = np.meshgrid(x_vals, y_vals)
-# ETA = Y * np.sqrt(U_inf /(nu * X + 1e-9))
+def v_velocity(eta, x):
+    f_interp = np.interp(eta, eta_vals, f)
+    fp_interp = np.interp(eta, eta_vals, fp)
+    return 0.5 * np.sqrt(U * nu / x) * (eta * fp_interp - f_interp)
 
-# for layer in ETA:
-#     y0 = [0, 0, fpp0_opt]
-#     sol = solve_ivp(blasius_eq,(min(layer),max(layer)),y0,t_eval=sorted(layer), method='RK45')
+
+x_vals = np.linspace(0, 2, int(2e3))
+y_vals = []
+fou, Ly, Ny = 10, 1, int(5e3)
+for j in range(Ny):
+    y_vals.append((fou ** (j * Ly / Ny  - Ly) )/ (fou - 1))
+y_vals = np.array(y_vals)
+
+X, Y = np.meshgrid(x_vals, y_vals)
+U_field = np.zeros_like(X)
+V_field = np.zeros_like(X)
+
+for i in tqdm(range(X.shape[0])):
+    for j in range(X.shape[1]):
+        x = X[i, j]
+        y = Y[i, j]
+        eta = eta_func(y, x)
+        U_field[i, j] = u_velocity(eta)
+        V_field[i, j] = v_velocity(eta, x)
+        
+stepX, stepY = 100, 10        
+plt.figure(figsize=(10, 6))
+plt.quiver(X[::stepX,::stepY], Y[::stepX,::stepY], U_field[::stepX,::stepY], V_field[::stepX,::stepY], scale=100)
+plt.title("Поле скоростей в пограничном слое (уравнение Блазиуса)")
+plt.xlabel("x (вдоль пластины)")
+plt.ylabel("y (поперёк пластины)")
+plt.grid(True)
+plt.show()
