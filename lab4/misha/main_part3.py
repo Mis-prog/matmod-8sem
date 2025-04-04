@@ -3,12 +3,13 @@ from scipy.integrate import solve_ivp
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 
+
 def blasius_eq(eta, y):
     f, fp, fpp = y
     fppp = -0.5 * f * fpp
     return [fp, fpp, fppp]
 
-def shoot(fpp0_guess, eta_max=10, n_points=500):
+def shoot(fpp0_guess, eta_max=400, n_points=int(5e3)):
     eta_vals = np.linspace(0, eta_max, n_points)
     y0 = [0, 0, fpp0_guess]  # f(0)=0, f'(0)=0, f''(0)=fpp0_guess
     sol = solve_ivp(blasius_eq, [0, eta_max], y0, t_eval=eta_vals)
@@ -27,6 +28,7 @@ def find_optimal_fpp0(target_fp_inf=1.0, tol=1e-6):
 
 fpp0_opt = find_optimal_fpp0()
 eta_vals, (f, fp, fpp) = shoot(fpp0_opt)
+print(f"f'(eta_max) = {fp[-1]}")
 
 
 U = 2
@@ -35,7 +37,7 @@ rho = 725
 nu = mu / rho
 
 def eta_func(y, x):
-    return y * np.sqrt(U / (nu * x + 1e-9))
+    return y * np.sqrt(U / (nu * x))
 
 def u_velocity(eta):
     return U * np.interp(eta, eta_vals, fp)
@@ -46,30 +48,52 @@ def v_velocity(eta, x):
     return 0.5 * np.sqrt(U * nu / x) * (eta * fp_interp - f_interp)
 
 
-x_vals = np.linspace(0, 2, int(2e3))
-y_vals = []
-fou, Ly, Ny = 10, 1, int(5e3)
-for j in range(Ny):
-    y_vals.append((fou ** (j * Ly / Ny  - Ly) )/ (fou - 1))
-y_vals = np.array(y_vals)
-
+x_vals = np.linspace(0.002, 2, int(1e3),dtype=np.float32)
+fou, Ly, Ny = 10, 1, int(1e3)
+j_vals = np.arange(Ny,dtype=np.float32)
+y_vals = (fou**(j_vals / Ny) * Ly - Ly) / (fou - 1)
 X, Y = np.meshgrid(x_vals, y_vals)
-U_field = np.zeros_like(X)
-V_field = np.zeros_like(X)
+X = X.astype(np.float32)
+Y = Y.astype(np.float32)
+U_field = np.zeros_like(X,dtype=np.float32)
+V_field = np.zeros_like(X,dtype=np.float32)
 
-for i in tqdm(range(X.shape[0])):
-    for j in range(X.shape[1]):
-        x = X[i, j]
-        y = Y[i, j]
-        eta = eta_func(y, x)
-        U_field[i, j] = u_velocity(eta)
-        V_field[i, j] = v_velocity(eta, x)
-        
-stepX, stepY = 100, 10        
+X_flat = X.ravel()
+Y_flat = Y.ravel()
+
+# Векторно считаем eta
+eta_flat = eta_func(Y_flat, X_flat)
+
+
+# Находим индексы ближайших значений eta в eta_vals
+indices = np.searchsorted(eta_vals, eta_flat, side='left')
+indices = np.clip(indices, 0, len(eta_vals) - 1)
+
+# Используем значения f и fp без интерполяции
+fp_vals = fp[indices]
+f_vals = f[indices]
+
+# Вычисление u и v
+U_flat = U * fp_vals
+V_flat = 0.5 * np.sqrt(U * nu / (X_flat)) * (eta_flat * fp_vals - f_vals)
+
+# Возврат в форму
+U_field = U_flat.reshape(X.shape)
+V_field = V_flat.reshape(X.shape)
+
+np.savetxt("result/U_field.txt", U_field, delimiter=" ")
+np.savetxt("result/V_field.txt", V_field, delimiter=" ")
+
+y_vals = np.linspace(0, Ly, Ny)
+X, Y = np.meshgrid(x_vals, y_vals)
+X = X.astype(np.float32)
+Y = Y.astype(np.float32)            
+stepX, stepY = 50, 50       
 plt.figure(figsize=(10, 6))
-plt.quiver(X[::stepX,::stepY], Y[::stepX,::stepY], U_field[::stepX,::stepY], V_field[::stepX,::stepY], scale=100)
+plt.quiver(X[::stepX,::stepY], Y[::stepX,::stepY], U_field[::stepX,::stepY], V_field[::stepX,::stepY] , scale=100, color='b')
 plt.title("Поле скоростей в пограничном слое (уравнение Блазиуса)")
 plt.xlabel("x (вдоль пластины)")
 plt.ylabel("y (поперёк пластины)")
+# plt.ylim(0,0.01)
 plt.grid(True)
 plt.show()

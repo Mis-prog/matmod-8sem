@@ -42,6 +42,7 @@ int main()
             double y_j = (pow(fou, (j * 1.0 / Ny)) * Ly - Ly) / (fou - 1);
             double y_j_left = (pow(fou, ((j - 1) * 1.0 / Ny)) * Ly - Ly) / (fou - 1);
             double y_j_right = (pow(fou, ((j + 1) * 1.0 / Ny)) * Ly - Ly) / (fou - 1);
+    
 
             double hy1 = y_j - y_j_left;
             double hy2 = y_j_right - y_j;
@@ -71,6 +72,16 @@ int main()
         found = false;
         // cout << i << endl;
     }
+
+    // for (int j = 1; j < Ny - 1; j++)
+    // {
+    //         double y_j = (pow(fou, (j * 1.0 / Ny)) * Ly - Ly) / (fou - 1);
+    //         double y_j_left = (pow(fou, ((j - 1) * 1.0 / Ny)) * Ly - Ly) / (fou - 1);
+    //         double y_j_right = (pow(fou, ((j + 1) * 1.0 / Ny)) * Ly - Ly) / (fou - 1);
+    //         if (j == 1 || j == (Ny - 2)){
+    //             cout << y_j << " ";
+    //         }
+    // }
 
     ofstream fout_U("../lab4/misha/result/results_u.txt"), fout_V("../lab4/misha/result/results_v.txt"), fout_regional("../lab4/misha/result/regional.txt");
     for (int j = 0; j < Ny; j+=2)
