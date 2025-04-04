@@ -13,4 +13,4 @@ target_compile_options(lab1_misha PRIVATE -O3 -march=native -flto -ffast-math -f
 
 add_executable(lab1_misha_v2 main_rustem.cpp)
 
-target_compile_options(lab1_misha_v2 PRIVATE -O3 -march=native -flto -ffast-math -funroll-loops)
+target_compile_options(lab1_misha_v2 PRIVATE -O3 -march=native -flto -ffast-math -funroll-loops -ftree-vectorize) 
