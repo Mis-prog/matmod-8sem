@@ -1,6 +1,13 @@
 Лабораторные по математическому моделированию за 8 семестр 
 ----------------
 
+### Cборка 1 ЛР
+```
+mkdir build && cd build
+cmake .. 
+cmake --build . --config Release -t lab1_misha_v2
+./lab1/misha/lab1_misha_v2
+```
 
 ### Cборка 3 ЛР
 ```
