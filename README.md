@@ -24,3 +24,6 @@ cmake ..
 cmake --build . --config Release -t lab4_misha
 ./lab4/misha/lab4_misha
 ```
+
+### Информация
+Подробно проект описан в Wiki

@@ -29,23 +29,23 @@ def find_optimal_fpp0(target_f_prime_inf=1, tol=1e-5, eta_max=10, n_points=100):
 fpp0_opt = find_optimal_fpp0() 
 eta_vals, (f_vals, f_prime_vals, f_double_prime_vals) = shoot(fpp0_opt)
 
-nu = 0.53e-3 / 725     
-U_inf = 2
+print()
 
-Nx, Ny = 20000, 5000
-x_vals = np.linspace(0 , 2, Nx)  
-y_vals = []
+# nu = 0.53e-3 / 725     
+# U_inf = 2
 
-fou, Ly = 10, 1
-for j in range(Ny):
-    y_vals.append((fou ** (j * Ly / Ny  - Ly) )/ (fou - 1))
-y_vals = np.array(y_vals)
+# Nx, Ny = 20000, 5000
+# x_vals = np.linspace(0 , 2, Nx)  
+# y_vals = []
 
-X, Y = np.meshgrid(x_vals, y_vals)
-ETA = Y * np.sqrt(U_inf /(nu * X + 1e-9))
+# fou, Ly = 10, 1
+# for j in range(Ny):
+#     y_vals.append((fou ** (j * Ly / Ny  - Ly) )/ (fou - 1))
+# y_vals = np.array(y_vals)
 
-for layer in ETA:
-    y0 = [0, 0, fpp0_opt]
-    sol = solve_ivp(blasius_eq,(min(layer),max(layer)),y0,t_eval=sorted(layer), method='RK45')
-# y0 = [0, 0, fpp0_opt]
-# sol = solve_ivp(blasius_eq,(0, 1000),y0,t_eval=ETA.flatten(), method='RK45')
+# X, Y = np.meshgrid(x_vals, y_vals)
+# ETA = Y * np.sqrt(U_inf /(nu * X + 1e-9))
+
+# for layer in ETA:
+#     y0 = [0, 0, fpp0_opt]
+#     sol = solve_ivp(blasius_eq,(min(layer),max(layer)),y0,t_eval=sorted(layer), method='RK45')
