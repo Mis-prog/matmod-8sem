@@ -11,7 +11,7 @@ ROWS = 128
 WIN = pygame.display.set_mode((WIDTH, WIDTH))
 
 WHITE = (255, 255, 255)
-BLACK = (107, 142, 35)
+BLACK = (255, 50, 255)
 
 
 Pmax = 10
@@ -412,6 +412,14 @@ plot = np.zeros((N, N)) + Pmax
 print('Iter = {}'.format(0))
 update_display(WIN, grid, ROWS, WIDTH)
 
+def count_alive(grid):
+    count = 0
+    for row in grid:
+        for node in row:
+            if node.colour == BLACK:
+                count += 1
+    return count
+TAKT, ACTIVE = [], []
 
 while run:
 
@@ -432,7 +440,16 @@ while run:
     update_display(WIN, grid, ROWS, WIDTH)
     #grid = update_grid(grid, time)
     # update_display(WIN, grid, ROWS, WIDTH)
-    print(time)
     iter += 1
+    active = count_alive(grid)
+    print(iter, active )
+    TAKT.append(iter)
+    ACTIVE.append(active)
     # run= False
 update_display(WIN, grid, ROWS, WIDTH)
+
+import matplotlib.pyplot as plt
+plt.plot(TAKT,ACTIVE)
+plt.xlabel('Такт')
+plt.ylabel('Кол-во живых клеток')
+plt.show()

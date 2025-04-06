@@ -11,7 +11,7 @@ ROWS = 128
 WIN = pygame.display.set_mode((WIDTH, WIDTH))
 
 WHITE = (255, 255, 255)
-BLACK = (107, 142, 35)
+BLACK = (255, 50, 255)
 
 
 Pmax = 10
@@ -451,4 +451,6 @@ update_display(WIN, grid, ROWS, WIDTH)
 
 import matplotlib.pyplot as plt
 plt.plot(TAKT,ACTIVE)
+plt.xlabel('Такт')
+plt.ylabel('Кол-во живых клеток')
 plt.show()

@@ -191,12 +191,93 @@ class CultureMedium1:
             result.append(''.join(row))
         
         return '\n'.join(result), active_cells, passive_cells, dead_cells
+    
+    
+class CultureMedium2:
+    def __init__(self, distribution_ratio: float, size: int):
+        self.Size = size
+        self.distribution_ratio = distribution_ratio
+        self.rand = random.Random()
+        self.generation = self._get_zero_generation(distribution_ratio, size)
+        # self.generation = self._get_cycle_generation(distribution_ratio, size)
+
+    def _get_zero_generation(self, distribution_ratio: float, size: int):
+        generation = [[CultureMediumCell() for _ in range(size)] for _ in range(size)]
+
+        amount_cell = round(size * size * distribution_ratio)
+        used = set()
+
+        while len(used) < amount_cell:
+            value = self.rand.randint(0, size * size - 1)
+            if value not in used:
+                used.add(value)
+                i, j = divmod(value, size)
+                generation[i][j].animal = CultureMediumAnimal()
+
+        return generation
+
+    def update_generation(self):
+        for row in self.generation:
+            for cell in row:
+                cell.new_era()
+
+        g = self.generation
+        s = self.size
+
+        self._jump_cell(g[0][0], g[0][1], g[1][0], g[1][1])
+        self._jump_cell(g[s - 1][0], g[s - 1][1], g[s - 2][0], g[s - 2][1])
+        self._jump_cell(g[0][s - 1], g[0][s - 2], g[1][s - 2], g[1][s - 1])
+        self._jump_cell(g[s - 1][s - 1], g[s - 2][s - 2], g[s - 1][s - 2], g[s - 2][s - 1])
+
+        for i in range(1, s - 1):
+            self._jump_cell(g[0][i], g[0][i - 1], g[0][i + 1], g[1][i - 1], g[1][i], g[1][i + 1])
+            self._jump_cell(g[s - 1][i], g[s - 1][i - 1], g[s - 1][i + 1], g[s - 2][i], g[s - 2][i - 1], g[s - 2][i + 1])
+            self._jump_cell(g[i][0], g[i - 1][0], g[i + 1][0], g[i][1], g[i - 1][1], g[i + 1][1])
+            self._jump_cell(g[i][s - 1], g[i - 1][s - 1], g[i + 1][s - 1], g[i][s - 2], g[i - 1][s - 2], g[i + 1][s - 2])
+
+        for i in range(1, s - 1):
+            for j in range(1, s - 1):
+                self._jump_cell(
+                    g[i][j],
+                    g[i - 1][j], g[i + 1][j], g[i][j - 1], g[i - 1][j - 1],
+                    g[i + 1][j - 1], g[i][j + 1], g[i - 1][j + 1], g[i + 1][j + 1]
+                )
+
+    def _jump_cell(self, current_cell: CultureMediumCell, *cells: CultureMediumCell):
+        if current_cell.animal:
+            current_cell.animal.to_alive(current_cell)
+            if current_cell.animal:
+                current_cell.animal.to_eat(current_cell)
+                empty_cells = [c for c in cells if c.animal is None]
+                if empty_cells:
+                    max_cell = max(empty_cells, key=lambda c: c.p)
+                    if max_cell.p > current_cell.p:
+                        current_cell.animal.to_jump(current_cell, max_cell)
+
+    def current_generation_to_string(self) -> Tuple[str, int, int, int]:
+        active_cells = 0
+        passive_cells = 0  # не используется в C# коде
+        dead_cells = 0
+
+        result = []
+        for row in self.generation:
+            line = ""
+            for cell in row:
+                if cell.animal:
+                    line += "O"
+                    active_cells += 1
+                else:
+                    line += " "
+                    dead_cells += 1
+            result.append(line)
+
+        return "\n".join(result), active_cells, passive_cells, dead_cells
 
 # Импортируем необходимые модули
 import time
 
 # Создаем среду с соотношением распределения 0.3 и размером 20x20
-culture = CultureMedium1(distribution_ratio=0.3, size=20)
+culture = CultureMedium2(distribution_ratio=0.3, size=20)
 
 
 # ACTIVE, DEAD = [],[]
@@ -364,7 +445,7 @@ if __name__ == "__main__":
     DISTRIBUTION = 0.3  # Начальная плотность животных
     
     # Создаем среду
-    culture = CultureMedium1(distribution_ratio=DISTRIBUTION, size=SIZE)
+    culture = CultureMedium2(distribution_ratio=DISTRIBUTION, size=SIZE)
     
     # Создаем и запускаем визуализатор
     visualizer = CultureVisualizer(culture, cell_size=5, fps=30)
