@@ -8,6 +8,9 @@ cmake ..
 cmake --build . --config Release -t lab1_misha_v2
 ./lab1/misha/lab1_misha_v2
 ```
+### Cборка 2 ЛР
+Выполнялась на питончике. Код находится в папке [lab2](/lab2/misha)
+
 
 ### Cборка 3 ЛР
 ```
