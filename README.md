@@ -21,20 +21,20 @@ cmake --build . --config Release -t lab3_misha
 ```
 
 ### Сборка 4 ЛР
-Первое задание
-```
-mkdir build && cd build
-cmake .. 
-cmake --build . --config Release -t lab4_misha
-./lab4/misha/lab4_misha
-```
-Второе задание 
-```
-cd lab4/misha/
-source bin/Scripts/activate
-pip install -r requirements.txt
-python main_part3.py
-```
+1. Первое задание
+  ```
+  mkdir build && cd build
+  cmake .. 
+  cmake --build . --config Release -t lab4_misha
+  ./lab4/misha/lab4_misha
+  ```
+2. Второе задание 
+  ```
+  cd lab4/misha/
+  source bin/Scripts/activate
+  pip install -r requirements.txt
+  python main_part3.py
+  ```
 
 ### Информация
 Подробно проект описан в Wiki
