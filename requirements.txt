@@ -6,4 +6,4 @@ jupyter
 pandas
 pyDOE2
 scipy
-numba
+PyQt5
