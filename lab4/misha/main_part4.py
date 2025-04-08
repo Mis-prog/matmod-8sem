@@ -26,13 +26,16 @@ import pandas as pd
 # plt.show()
 
 
-u_c = np.loadtxt("result/results_u.txt")
-v_c = np.loadtxt("result/results_v.txt")
+# u_c = np.loadtxt("result/results_u.txt")
+v_c = np.loadtxt("result/results_v.txt")[:, 4000:]
 
-u_py = np.load("result/U_field.npy")
-v_py = np.load("result/V_field.npy")
 
-diff = u_c - u_py
+# u_py = np.load("result/U_field.npy")
+v_py = np.load("result/V_field.npy")[:, 4000:]
+
+print(v_py)
+
+diff = v_c - v_py
 
 # Получаем размерности
 ny, nx = diff.shape
@@ -45,10 +48,9 @@ fig = plt.figure(figsize=(10, 7))
 ax = fig.add_subplot(111, projection='3d')
 surf = ax.plot_surface(X, Y, diff, cmap='seismic')
 
-ax.set_title("Поверхность разности u_c - u_py")
+ax.set_title("Поверхность разности v_c - v_py")
 ax.set_xlabel("X")
 ax.set_ylabel("Y")
 ax.set_zlabel("Difference")
 
-fig.colorbar(surf, shrink=0.5, aspect=10)
 plt.show()

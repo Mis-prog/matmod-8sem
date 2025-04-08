@@ -29,7 +29,7 @@ int main()
 
     for (int i = 0; i < Nx; i++)
     {
-        v[i][Ny - 1] = v0_x;
+        u[i][Ny - 1] = v0_x;
     }
 
     cout << endl;
