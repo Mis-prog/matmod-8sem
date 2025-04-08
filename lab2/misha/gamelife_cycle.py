@@ -1,8 +1,43 @@
-
 import numpy as np
 import pygame
 import sys
 import os
+import re
+
+
+def rle_to_numpy(rle_string):
+    lines = rle_string.strip().splitlines()
+    header = [line for line in lines if not line.startswith('#') and not line.startswith('x')][0]
+    pattern_lines = [line for line in lines if not line.startswith('#') and not line.startswith('x')]
+    rle_data = ''.join(pattern_lines).replace('\n', '').replace('!', '')
+
+    # Парсим rle данные
+    rle_tokens = re.findall(r'\d*[bo$]', rle_data)
+    current_row = []
+    result = []
+
+    for token in rle_tokens:
+        count = int(re.findall(r'\d+', token)[0]) if re.findall(r'\d+', token) else 1
+        char = token[-1]
+
+        if char == 'b':
+            current_row.extend([0] * count)
+        elif char == 'o':
+            current_row.extend([1] * count)
+        elif char == '$':
+            result.append(current_row)
+            current_row = []
+
+    # Добавляем последнюю строку, если не пустая
+    if current_row:
+        result.append(current_row)
+
+    # Выровняем строки по длине
+    max_len = max(len(row) for row in result)
+    for row in result:
+        row.extend([0] * (max_len - len(row)))
+
+    return np.array(result, dtype=int)
 
 
 class GameLife2:
@@ -15,46 +50,61 @@ class GameLife2:
         # Создаём пустое поле
         generation = np.zeros((size, size), dtype=int)
 
-        # Квадрат (3-8 строки, 3-8 столбцы, без диагонали)
-        for i in range(3, 9):
-            for j in range(3, 9):
-                if i != j:
-                    generation[i, j] = 1
-        generation[3, 8] = 0
-        generation[4, 7] = 0
-        generation[5, 6] = 0
-        generation[6, 5] = 0
-        generation[7, 4] = 0
-        generation[8, 3] = 0
+        # # Биполь (20-22 строки, 3-5 столбцы)
+        generation[5, 3:6] = [0, 0, 0]
+        generation[6, 3:6] = [1, 1, 1]
+        generation[7, 3:6] = [0, 0, 0]
 
-        # Крест (3-10 строки, 20-27 столбцы)
-        generation[3, 20:28] = [0, 0, 1, 1, 1, 1, 0, 0]
-        generation[4, 20:28] = [0, 0, 1, 0, 0, 1, 0, 0]
-        generation[5, 20:28] = [1, 1, 1, 0, 0, 1, 1, 1]
-        generation[6, 20:28] = [1, 0, 0, 0, 0, 0, 0, 1]
-        generation[7, 20:28] = [1, 0, 0, 0, 0, 0, 0, 1]
-        generation[8, 20:28] = [1, 1, 1, 0, 0, 1, 1, 1]
-        generation[9, 20:28] = [0, 0, 1, 0, 0, 1, 0, 0]
-        generation[10, 20:28] = [0, 0, 1, 1, 1, 1, 0, 0]
+        # # Жаба (20-23 строки, 10-13 столбцы)
+        generation[5, 10:14] = [0, 0, 0, 0]
+        generation[6, 10:14] = [0, 1, 1, 1]
+        generation[7, 10:14] = [1, 1, 1, 0]
+        generation[8, 10:14] = [0, 0, 0, 0]
+        #
+        # # Маяк (20-23 строки, 20-23 столбцы)
+        generation[5, 20:24] = [1, 1, 0, 0]
+        generation[6, 20:24] = [1, 0, 0, 0]
+        generation[7, 20:24] = [0, 0, 0, 1]
+        generation[8, 20:24] = [0, 0, 1, 1]
 
-        # Круги (3-15 строки, 40-52 столбцы)
-        generation[3, 40:53] = [0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0]
-        generation[4, 40:53] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        generation[5, 40:53] = [1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1]
-        generation[6, 40:53] = [1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1]
-        generation[7, 40:53] = [1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1]
-        generation[8, 40:53] = [0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0]
-        generation[9, 40:53] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        generation[10, 40:53] = [0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0]
-        generation[11, 40:53] = [1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1]
-        generation[12, 40:53] = [1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1]
-        generation[13, 40:53] = [1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1]
-        generation[14, 40:53] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        generation[15, 40:53] = [0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0]
 
-        # Семафор (3 строка, 60-62 столбцы)
-        generation[3, 60:63] = [1, 1, 1]
+        rle5_1 = '''
+        x = 13, y = 12, rule = B3/S23
+        2o$bo$bobo$2b2o$6b2o$6bo$6bo$5b2o$9b2o$9bobo$11bo$11b2o!
+        '''
 
+        rle5_2 = '''
+        x = 16, y = 7, rule = B3/S23
+        7b2o$2b2obo4bob2o$2bo10bo$3b2o6b2o$3o2b6o2b3o$o2bo8bo2bo$b2o10b2o!
+        '''
+
+        rle8 = '''
+        x = 10, y = 5, rule = B3/S23
+        6bobob$5bo4b$2o2bo4bo$2obo2bob2o$4b2o!
+        '''
+
+
+        pattern = rle_to_numpy(rle5_1)
+
+        h, w = pattern.shape
+        start_x = 5
+        start_y = 30
+        generation[start_x:start_x+h, start_y:start_y+w] = pattern
+
+
+        pattern = rle_to_numpy(rle5_2)
+
+        h, w = pattern.shape
+        start_x = 20
+        start_y = 1
+        generation[start_x:start_x+h, start_y:start_y+w] = pattern
+
+        pattern = rle_to_numpy(rle8)
+
+        h, w = pattern.shape
+        start_x = 20
+        start_y = 30
+        generation[start_x:start_x+h, start_y:start_y+w] = pattern
         return generation
 
     def update_generation(self):
@@ -162,8 +212,8 @@ def main():
     frame_count = 0
     CELL_SIZE = 10  # Уменьшил размер клеток, чтобы всё уместилось
     GRID_COLOR = (50, 50, 50)
-    ALIVE_COLOR = (255, 255, 255)
-    DEAD_COLOR = (0, 0, 0)
+    ALIVE_COLOR = (0, 0, 0)
+    DEAD_COLOR = (255, 255, 255)
     BACKGROUND_COLOR = (10, 10, 10)
     FPS = 1
 
