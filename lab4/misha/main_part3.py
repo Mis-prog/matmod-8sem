@@ -53,7 +53,7 @@ def v_velocity(eta, x):
     return 0.5 * np.sqrt(U * nu / x) * (eta * fp_interp - f_interp)
 
 
-x_vals = np.linspace(2, 4, int(2e4), dtype=np.float32)
+x_vals = np.linspace(0, 2, int(2e4), dtype=np.float32)
 fou, Ly, Ny = 10, 1, int(5e3)
 j_vals = np.arange(Ny, dtype=np.float32)
 y_vals = (fou ** (j_vals / Ny) * Ly - Ly) / (fou - 1)
@@ -85,21 +85,48 @@ V_flat = 0.5 * np.sqrt(U * nu / (X_flat)) * (eta_flat * fp_vals - f_vals)
 U_field = U_flat.reshape(X.shape)
 V_field = V_flat.reshape(X.shape)
 
-np.savetxt("result/U_field.txt", U_field, delimiter=" ")
-np.savetxt("result/V_field.txt", V_field, delimiter=" ")
+threshold = 2
+epsilon = 5e-6
+
+mask = U_field >= (threshold - epsilon)
+
+results = []
+
+# y_vals = np.linspace(0, Ly, Ny)
+# X, Y = np.meshgrid(x_vals, y_vals)
+for j in range(U_field.shape[1]):  # Перебор всех столбцов
+    column_mask = mask[:, j]  # Маска для текущего столбца
+    first_row_index = np.argmax(column_mask)  # Находим индекс первого True в столбце
+
+    if column_mask[first_row_index]:  # Если условие выполняется
+        first_value = U_field[first_row_index, j]
+        first_x = X[first_row_index, j]
+        first_y = Y[first_row_index, j]
+        results.append([first_x, first_y, first_value])
+        print(f"Столбец {j}: Первое значение U ≈ 2 на позиции ({first_x}, {first_y}), U = {first_value}")
+
+np.savetxt("result/first_values.csv", results, delimiter=",", header="x,y,U", comments="")
+
+
+np.save("result/U_field.npy", U_field[::2, ::2])
+np.save("result/V_field.npy", V_field[::2, ::2])
 
 y_vals = np.linspace(0, Ly, Ny)
 X, Y = np.meshgrid(x_vals, y_vals)
+
 X = X.astype(np.float32)
 Y = Y.astype(np.float32)
-stepX, stepY = 30, 50
+stepX, stepY = 1, 600
 plt.figure(figsize=(10, 6))
 plt.quiver(X[::stepX, ::stepY], Y[::stepX, ::stepY], U_field[::stepX, ::stepY], V_field[::stepX, ::stepY], scale=100,
            color='b')
-# plt.ylim(0, 0.025)
-plt.title("Поле скоростей в пограничном слое (уравнение Блазиуса)")
-plt.xlabel("x (вдоль пластины)")
-plt.ylabel("y (поперёк пластины)")
-# plt.ylim(0,0.01)
+plt.ylim(0, 0.025)
+plt.title("Погран слой")
+plt.xlabel("x")
+plt.ylabel("y")
 plt.grid(True)
+
+results = np.array(results)
+plt.plot(results[:, 0], results[:, 1], color='red')
+
 plt.show()
