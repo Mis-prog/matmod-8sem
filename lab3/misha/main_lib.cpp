@@ -4,7 +4,6 @@
 #include "Eigen/src/SparseCore/SparseMatrix.h"
 #include "Eigen/src/SparseCore/SparseUtil.h"
 #include "Eigen/src/SparseLU/SparseLU.h"
-#include <thread>
 
 using namespace std;
 
@@ -21,17 +20,24 @@ LIB::LIB(int Nx, int Ny, double L, double Lpml, double ynull, double k, double e
 
 double LIB::Fz(double y) {
     double z = y;
-    if (abs(z) <= 2) {
-        cout << z << endl;
-        return 0.25 * (1 + cos(Pi * z / 2));
+    if (abs(z) <= 10) {
+        double impulse = 0.25 * (1 + cos(M_PI * z / 2));
+        cout << "Импульс: " << impulse << endl;
+        return impulse;
     } else return 0;
 }
 
 complex<double> LIB::_gamma(double x) {
+    // if (Lpml < 1e-10) {
+    //     return complex<double>(1.0, 0.0);
+    // }
     return 1.0 + complex<double>(0, 1) / k * pow((x - L) / Lpml, 2) * 20.0;
 }
 
 complex<double> LIB::dgamma(double x) {
+    // if (Lpml < 1e-10) {
+    //     return complex<double>(1.0, 0.0);
+    // }
     return complex<double>(0, 1) / k * pow((x - L) / Lpml, 1) * 2.0 / Lpml * 20.0;
 }
 
@@ -47,37 +53,36 @@ int LIB::id(int i, int j, int l) {
     return (Nx + 1) * (Ny + 1) + 2 * i * (Ny + 1) + j + l * (Ny + 1);
 }
 
+
 int LIB::calc() {
     double hy = 1.0 / Ny;
     double hx = L / Nx;
-    int Nl = int(Lpml / hx);
+    int Nl = (Lpml < 1e-10) ? 0 : int(Lpml / hx);
     cout << Lpml << " b " << hx << endl;
-    int N = (Nx + 1) * (Ny + 1) + (Ny + 1) * (Nl + 1) * 2;
+    int N = (Lpml < 1e-10) ? (Nx + 1) * (Ny + 1) : (Nx + 1) * (Ny + 1) + (Ny + 1) * (Nl + 1) * 2;
     Eigen::VectorXd f(N);
     Eigen::SparseMatrix<double> s(N, N); {
         f.setZero();
-        std::cout << Nx + Nl + 1 << " " << N << " " << (Nx + 1) * (Ny + 1) << " " << (Ny + 1) * (Nl + 1) * 2 << endl;
-        std::vector<Eigen::Triplet<double>> triplets;
-
-        // Основная область
+        //sys.setZero();
+        std::cout << Nx + Nl + 1 << " " << N << " " << (Nx + 1) * (Ny + 1) << " " << (Ny + 1) * (Nl
+            + 1) * 2 << endl;
+        std::vector<Eigen::Triplet<double> > triplets;
         for (int i = 1; i < Nx; i++)
             for (int j = 1; j < Ny; j++) {
                 int in = id(i, j);
+
                 triplets.push_back(Eigen::Triplet<double>(in, id(i, j),
-                    (-2 / (hx * hx) - 2 / (hy * hy)) + k * k * (1 + eps * fi(j * hy))));
+                                                          (-2 / (hx * hx) - 2 / (hy * hy)) + k * k * (1 + eps * fi(
+                                                                  j * hy))));
                 triplets.push_back(Eigen::Triplet<double>(in, id(i - 1, j), 1 / (hx * hx)));
                 triplets.push_back(Eigen::Triplet<double>(in, id(i + 1, j), 1 / (hx * hx)));
                 triplets.push_back(Eigen::Triplet<double>(in, id(i, j - 1), 1 / (hy * hy)));
                 triplets.push_back(Eigen::Triplet<double>(in, id(i, j + 1), 1 / (hy * hy)));
             }
-
-        // Левая граница (i = 0)
         for (int j = 1; j < Ny; j++) {
             f(id(0, j)) = Fz((j * hy - ynull) / hy) / hy;
             triplets.push_back(Eigen::Triplet<double>(id(0, j), id(0, j), 1));
         }
-
-        // Нижняя и верхняя границы основной области
         for (int i = 0; i < Nx + 1; i++) {
             f(id(i, 0)) = 0;
             triplets.push_back(Eigen::Triplet<double>(id(i, 0), id(i, 0), 1));
@@ -85,109 +90,146 @@ int LIB::calc() {
             triplets.push_back(Eigen::Triplet<double>(id(i, Ny), id(i, Ny), 1));
         }
 
-        // PML-область (внутренние точки)
-        for (int i = 1; i < Nl; i++)
+        if (Nl == 0) {
             for (int j = 1; j < Ny; j++) {
-                double x = L + i * hx;
-                complex<double> c1 = 1.0 / (_gamma(x) * _gamma(x));
-                complex<double> c2 = dgamma(x) / (_gamma(x) * _gamma(x) * _gamma(x));
-                double a = c1.real();
-                double b = c1.imag();
-                double c = c2.real();
-                double d = c2.imag();
-                int id1 = id(i, j, 0);
-                int id2 = id(i, j, 1);
-                triplets.push_back(Eigen::Triplet<double>(id1, id(i, j, 0),
-                    (-2 * a / (hx * hx) - 2 / (hy * hy) + k * k * (1 + eps * fi(j * hy)))));
-                triplets.push_back(Eigen::Triplet<double>(id1, id(i - 1, j, 0), (a / (hx * hx) + c / (2 * hx))));
-                triplets.push_back(Eigen::Triplet<double>(id1, id(i + 1, j, 0), (a / (hx * hx) - c / (2 * hx))));
-                triplets.push_back(Eigen::Triplet<double>(id1, id(i, j - 1, 0), (1 / (hy * hy))));
-                triplets.push_back(Eigen::Triplet<double>(id1, id(i, j + 1, 0), (1 / (hy * hy))));
-                triplets.push_back(Eigen::Triplet<double>(id1, id(i, j, 1), (-2 * -b / (hx * hx))));
-                triplets.push_back(Eigen::Triplet<double>(id1, id(i - 1, j, 1), (-b / (hx * hx) - d / (2 * hx))));
-                triplets.push_back(Eigen::Triplet<double>(id1, id(i + 1, j, 1), (-b / (hx * hx) + d / (2 * hx))));
-                if (i > 1) {
-                    triplets.push_back(Eigen::Triplet<double>(id2, id(i, j, 1),
-                        (-2 * a / (hx * hx) - 2 / (hy * hy) + k * k * (1 + eps * fi(j * hy)))));
-                    triplets.push_back(Eigen::Triplet<double>(id2, id(i - 1, j, 1), (a / (hx * hx) + c / (2 * hx))));
-                    triplets.push_back(Eigen::Triplet<double>(id2, id(i + 1, j, 1), (a / (hx * hx) - c / (2 * hx))));
-                    triplets.push_back(Eigen::Triplet<double>(id2, id(i, j - 1, 1), (1 / (hy * hy))));
-                    triplets.push_back(Eigen::Triplet<double>(id2, id(i, j + 1, 1), (1 / (hy * hy))));
-                    triplets.push_back(Eigen::Triplet<double>(id2, id(i, j, 0), (-2 * b / (hx * hx))));
-                    triplets.push_back(Eigen::Triplet<double>(id2, id(i - 1, j, 0), (b / (hx * hx) + d / (2 * hx))));
-                    triplets.push_back(Eigen::Triplet<double>(id2, id(i + 1, j, 0), (b / (hx * hx) - d / (2 * hx))));
-                }
+                f(id(Nx, j)) = 0; // Условие Дирихле
+                triplets.push_back(Eigen::Triplet<double>(id(Nx, j), id(Nx, j), 1));
             }
+        }
 
-        // Граница между основной областью и PML
-        for (int j = 1; j < Ny; j++) {
-            int id1 = id(Nx, j);       // Правая граница основной области
-            int id2 = id(0, j, 0);     // Начало PML
-            triplets.push_back(Eigen::Triplet<double>(id1, id1, 1));
-            triplets.push_back(Eigen::Triplet<double>(id1, id2, -1));
-            triplets.push_back(Eigen::Triplet<double>(id2, id1, 3));
-            triplets.push_back(Eigen::Triplet<double>(id2, id(Nx - 1, j), -4));
-            triplets.push_back(Eigen::Triplet<double>(id2, id(Nx - 2, j), 1));
-            triplets.push_back(Eigen::Triplet<double>(id2, id2, 3));
-            if (Nl > 0) { // Условие для PML-узлов i = 1, 2, ...
+        if (Nl > 0) {
+            for (int i = 1; i < Nl; i++)
+                for (int j = 1; j < Ny; j++) {
+                    double x = L + i * hx;
+                    complex<double> c1 = 1.0 / (_gamma(x) * _gamma(x));
+                    complex<double> c2 = dgamma(x) / (_gamma(x) * _gamma(x) *
+                                                      _gamma(x));
+                    double a = c1.real();
+                    double b = c1.imag();
+                    double c = c2.real();
+                    double d = c2.imag();
+                    int id1 = id(i, j, 0);
+                    int id2 = id(i, j, 1);
+                    triplets.push_back(Eigen::Triplet<double>(id1, id(i, j, 0),
+                                                              (-2 * a / (hx * hx) - 2 / (hy * hy) + k * k * (1 + eps *
+                                                                   fi(
+                                                                       j * hy)))));
+                    triplets.push_back(Eigen::Triplet<double>(id1, id(i - 1, j, 0), (a / (hx * hx) + c / (2 * hx))));
+                    triplets.push_back(Eigen::Triplet<double>(id1, id(i + 1, j, 0), (a / (hx * hx) - c / (2 * hx))));
+                    triplets.push_back(Eigen::Triplet<double>(id1, id(i, j - 1, 0), (1 / (hy * hy))));
+                    triplets.push_back(Eigen::Triplet<double>(id1, id(i, j + 1, 0), (1 / (hy * hy))));
+                    //////
+                    triplets.push_back(Eigen::Triplet<double>(id1, id(i, j, 1), (-2 * -b / (hx * hx))));
+                    triplets.push_back(Eigen::Triplet<double>(id1, id(i - 1, j, 1), (-b / (hx * hx) - d / (2 * hx))));
+                    triplets.push_back(Eigen::Triplet<double>(id1, id(i + 1, j, 1), (-b / (hx * hx) + d / (2 * hx))));
+                    //////
+                    if (i > 1) {
+                        triplets.push_back(Eigen::Triplet<double>(id2, id(i, j, 1),
+                                                                  (-2 * a / (hx * hx) - 2 / (hy * hy) + k * k * (1 + eps
+                                                                       *
+                                                                       fi(j * hy)))));
+                        triplets.push_back(
+                            Eigen::Triplet<double>(id2, id(i - 1, j, 1), (a / (hx * hx) + c / (2 * hx))));
+                        triplets.push_back(
+                            Eigen::Triplet<double>(id2, id(i + 1, j, 1), (a / (hx * hx) - c / (2 * hx))));
+                        triplets.push_back(Eigen::Triplet<double>(id2, id(i, j - 1, 1), (1 / (hy * hy))));
+                        triplets.push_back(Eigen::Triplet<double>(id2, id(i, j + 1, 1), (1 / (hy * hy))));
+                        //////
+                        triplets.push_back(Eigen::Triplet<double>(id2, id(i, j, 0), (-2 * b / (hx * hx))));
+                        triplets.push_back(
+                            Eigen::Triplet<double>(id2, id(i - 1, j, 0), (b / (hx * hx) + d / (2 * hx))));
+                        triplets.push_back(
+                            Eigen::Triplet<double>(id2, id(i + 1, j, 0), (b / (hx * hx) - d / (2 * hx))));
+                    }
+                }
+            for (int j = 1; j < Ny; j++) {
+                int id1 = id(Nx, j);
+                int id2 = id(0, j, 0);
+                triplets.push_back(Eigen::Triplet<double>(id1, id1, 1));
+                triplets.push_back(Eigen::Triplet<double>(id1, id2, -1));
+                /////////////////////////
+                triplets.push_back(Eigen::Triplet<double>(id2, id1, 3));
+                triplets.push_back(Eigen::Triplet<double>(id2, id(Nx - 1, j), -4));
+                triplets.push_back(Eigen::Triplet<double>(id2, id(Nx - 2, j), 1));
+                //////////
+                triplets.push_back(Eigen::Triplet<double>(id2, id2, 3));
                 triplets.push_back(Eigen::Triplet<double>(id2, id(1, j, 0), -4));
                 triplets.push_back(Eigen::Triplet<double>(id2, id(2, j, 0), 1));
+                ///////////////////////////////
                 int id3 = id(0, j, 1);
                 triplets.push_back(Eigen::Triplet<double>(id3, id3, 1));
+                //////////////////////////////
                 int id4 = id(1, j, 1);
                 triplets.push_back(Eigen::Triplet<double>(id4, id3, -3 / (2 * hx)));
                 triplets.push_back(Eigen::Triplet<double>(id4, id4, 4 / (2 * hx)));
                 triplets.push_back(Eigen::Triplet<double>(id4, id(2, j, 1), -1 / (2 * hx)));
+                //triplets.push_back(Eigen::Triplet<double>(id4, id3, 1));
+                //triplets.push_back(Eigen::Triplet<double>(id4, id4, -1));
+            }
+            for (int i = 0; i < Nl + 1; i++) {
+                f(id(i, 0, 0)) = 0;
+                triplets.push_back(Eigen::Triplet<double>(id(i, 0, 0), id(i, 0, 0), 1));
+                f(id(i, Ny, 0)) = 0;
+                triplets.push_back(Eigen::Triplet<double>(id(i, Ny, 0), id(i, Ny, 0), 1));
+                f(id(i, 0, 1)) = 0;
+                triplets.push_back(Eigen::Triplet<double>(id(i, 0, 1), id(i, 0, 1), 1));
+                f(id(i, Ny, 1)) = 0;
+                triplets.push_back(Eigen::Triplet<double>(id(i, Ny, 1), id(i, Ny, 1), 1));
+            }
+            for (int j = 0; j < Ny + 1; j++) {
+                triplets.push_back(Eigen::Triplet<double>(id(Nl, j, 0), id(Nl, j, 0), 1));
+                triplets.push_back(Eigen::Triplet<double>(id(Nl, j, 1), id(Nl, j, 1), 1));
             }
         }
-
-        // Граничные условия для PML
-        for (int i = 0; i < Nl + 1; i++) {
-            f(id(i, 0, 0)) = 0;
-            triplets.push_back(Eigen::Triplet<double>(id(i, 0, 0), id(i, 0, 0), 1));
-            f(id(i, Ny, 0)) = 0;
-            triplets.push_back(Eigen::Triplet<double>(id(i, Ny, 0), id(i, Ny, 0), 1));
-            f(id(i, 0, 1)) = 0;
-            triplets.push_back(Eigen::Triplet<double>(id(i, 0, 1), id(i, 0, 1), 1));
-            f(id(i, Ny, 1)) = 0;
-            triplets.push_back(Eigen::Triplet<double>(id(i, Ny, 1), id(i, Ny, 1), 1));
-        }
-
-        // Край PML
-        for (int j = 0; j < Ny + 1; j++) {
-            triplets.push_back(Eigen::Triplet<double>(id(Nl, j, 0), id(Nl, j, 0), 1));
-            triplets.push_back(Eigen::Triplet<double>(id(Nl, j, 1), id(Nl, j, 1), 1));
-        }
-
         s.setFromTriplets(triplets.begin(), triplets.end());
     }
-    cout << "Система составлена" << endl;
-    Eigen::SparseLU<Eigen::SparseMatrix<double> > solver(s);
+
+    std::cout << "Matrix size: " << s.rows() << " x " << s.cols() << ", non-zeros: " << s.nonZeros() << std::endl;
+
+    Eigen::SparseLU<Eigen::SparseMatrix<double> > solver;
+    solver.analyzePattern(s); // Анализ структуры матрицы
+    solver.factorize(s);
+
     if (solver.info() != Eigen::Success) {
         cout << "Failed" << endl;
     }
     Eigen::MatrixXd sol = solver.solve(f);
 
-    cout << "Система решена" << endl;
-
     std::ostringstream filename;
-    if (Lpml==0) {
+    if (Lpml > 1e-10) {
+        if (eps < 1e-10) {
+            filename << "../lab3/misha/result/result" << k << "y0" << std::fixed << std::setprecision(2) << ynull <<
+                    ".txt";
+        } else {
+            filename << "../lab3/misha/result/result" << k << "y0" << std::fixed << std::setprecision(2) << ynull
+                    << "eps" <<  std::fixed << std::setprecision(10) << eps << ".txt";
+        }
+    } else {
         filename << "../lab3/misha/result/result_not_pml" << k << "y0" << std::fixed << std::setprecision(2) << ynull <<
-                ".txt";
-    }else {
-        filename << "../lab3/misha/result/result" << k << "y0" << std::fixed << std::setprecision(2) << ynull <<
                 ".txt";
     }
     ofstream file(filename.str());
 
-    for (int j = 0; j < Ny + 1; j += 4) {
-        for (int i = 0; i < Nx + 1; i += 4) {
-            file << j * hy << " " << i * hx << " " << sol(id(i, j)) << endl;
+    for (int j = 0; j < Ny + 1; j += 1) {
+        // for (int i = 0; i < Nx + 1; i += 1)
+        // {
+        //     file << j * hy << " " << i * hx << " " << sol(id(i, j)) << endl;
+        // }
+
+        for (int i = 0; i < Nx + 1; i += 1) {
+            file << sol(id(i, j)) << " ";
         }
 
-        for (int i = 0; i < Nl + 1; i += 4) {
-            file << j * hy << " " << L + i * hx << " " << sol(id(i, j, 0)) << endl;
+        // for (int i = 0; i < Nl + 1; i += 1) {
+        //     file << j * hy << " " << L + i * hx << " " << sol(id(i, j, 0)) << endl;
+        // }
+
+        if (Nl > 0) {
+            for (int i = 0; i < Nl + 1; i += 1) {
+                file << sol(id(i, j, 0)) << " ";
+            }
         }
+        file << endl;
     }
     file.close();
     return 0;
