@@ -18,4 +18,4 @@ target_compile_options(lab3_rustem PRIVATE -O3 -march=native -flto -ffast-math -
 # Создание цели для варианта Вадима
 add_executable(lab3_vadim main_vadim.cpp)
 target_include_directories(lab3_vadim PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../eigen)
-target_compile_options(lab3_vadim PRIVATE -O3 -march=native -flto -ffast-math -funroll-loops)
+target_compile_options(lab3_vadim PRIVATE -O3 -march=native -ffast-math -funroll-loops)
