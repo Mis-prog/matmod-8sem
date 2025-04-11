@@ -17,7 +17,7 @@ target_include_directories(
 target_link_libraries(lab3_misha_lib PUBLIC OpenMP::OpenMP_CXX)
 
 
-add_executable(lab3_misha main_my.cpp)
+add_executable(lab3_misha main_test.cpp)
 target_compile_options(lab3_misha PRIVATE -O3 -march=native -flto -ffast-math -funroll-loops)
 target_link_libraries(lab3_misha PRIVATE lab3_misha_lib OpenMP::OpenMP_CXX)
 target_include_directories(
@@ -26,7 +26,7 @@ target_include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}/../eigen
 )
 
-add_executable(lab3_misha_v2 main_rustem.cpp)
+add_executable(lab3_misha_v2 main.cpp)
 target_include_directories(
         lab3_misha_v2
         PRIVATE

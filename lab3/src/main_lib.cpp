@@ -20,7 +20,7 @@ LIB::LIB(int Nx, int Ny, double L, double Lpml, double ynull, double k, double e
 
 double LIB::Fz(double y) {
     double z = y;
-    if (abs(z) <= 10) {
+    if (abs(z) <= 5) {
         double impulse = 0.25 * (1 + cos(M_PI * z / 2));
         cout << "Импульс: " << impulse << endl;
         return impulse;
@@ -195,17 +195,18 @@ int LIB::calc() {
     }
     Eigen::MatrixXd sol = solver.solve(f);
 
+
     std::ostringstream filename;
     if (Lpml > 1e-10) {
         if (eps < 1e-10) {
-            filename << "../lab3/misha/result/result" << k << "y0" << std::fixed << std::setprecision(2) << ynull <<
+            filename << "../lab3/src/result/result" << k << "y0" << std::fixed << std::setprecision(2) << ynull <<
                     ".txt";
         } else {
-            filename << "../lab3/misha/result/result" << k << "y0" << std::fixed << std::setprecision(2) << ynull
+            filename << "../lab3/src/result/result" << k << "y0" << std::fixed << std::setprecision(2) << ynull
                     << "eps" <<  std::fixed << std::setprecision(10) << eps << ".txt";
         }
     } else {
-        filename << "../lab3/misha/result/result_not_pml" << k << "y0" << std::fixed << std::setprecision(2) << ynull <<
+        filename << "../lab3/src/result/result_not_pml" << k << "y0" << std::fixed << std::setprecision(2) << ynull <<
                 ".txt";
     }
     ofstream file(filename.str());
