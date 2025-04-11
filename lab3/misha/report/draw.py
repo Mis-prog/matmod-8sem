@@ -1,8 +1,19 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+import os
+import matplotlib
+matplotlib.use('TkAgg')
 
-data = np.loadtxt('../result/result20y00.50.txt')
+print("Текущая рабочая директория:", os.getcwd())
+
+data = np.loadtxt('../result/result10y00.50.txt')
+
+print("Макс:", np.max(data))
+print("Мин:", np.min(data))
+print("Есть NaN?", np.isnan(data).any())
+print("Есть inf?", np.isinf(data).any())
+
 Ny, Nx = data.shape
 print(Ny, Nx)
 x = np.linspace(0, 15, Nx)
@@ -33,3 +44,5 @@ plt.ylabel('z')
 plt.grid(True)
 plt.title('Проекция на ZX')
 plt.show()
+
+

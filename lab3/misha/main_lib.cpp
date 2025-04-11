@@ -20,7 +20,7 @@ LIB::LIB(int Nx, int Ny, double L, double Lpml, double ynull, double k, double e
 
 double LIB::Fz(double y) {
     double z = y;
-    if (abs(z) <= 10) {
+    if (abs(z) <= 5) {
         double impulse = 0.25 * (1 + cos(M_PI * z / 2));
         cout << "Импульс: " << impulse << endl;
         return impulse;
@@ -194,6 +194,7 @@ int LIB::calc() {
         cout << "Failed" << endl;
     }
     Eigen::MatrixXd sol = solver.solve(f);
+
 
     std::ostringstream filename;
     if (Lpml > 1e-10) {
