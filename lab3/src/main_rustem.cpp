@@ -189,7 +189,7 @@ int main()
     Eigen::MatrixXd sol = solver.solve(f);
 
     std::ostringstream filename;
-    filename << "../lab3/misha/result/result" << k << "y0" << std::fixed << std::setprecision(2) << ynull << ".txt";
+    filename << "../lab3/src/result/result" << k << "y0" << std::fixed << std::setprecision(2) << ynull << ".txt";
     ofstream file(filename.str());
 
     for (int j = 0; j < Ny + 1; j += 4)

@@ -54,7 +54,7 @@ int main() {
     }
 
     // Формируем путь
-    std::filesystem::path dir = "../lab1/misha/result-" + M_str + "×" + N_str;
+    std::filesystem::path dir = "../lab1/src/result-" + M_str + "×" + N_str;
     if (filesystem::create_directory(dir)) {
         std::cout << "Папка создана: " << dir << std::endl;
     }

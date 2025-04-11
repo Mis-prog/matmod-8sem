@@ -83,7 +83,7 @@ int main()
     //         }
     // }
 
-    ofstream fout_U("../lab4/misha/result/results_u.txt"), fout_V("../lab4/misha/result/results_v.txt"), fout_regional("../lab4/misha/result/regional.txt");
+    ofstream fout_U("../lab4/src/result/results_u.txt"), fout_V("../lab4/src/result/results_v.txt"), fout_regional("../lab4/src/result/regional.txt");
     for (int j = 0; j < Ny; j+=2)
     {
         for (int i = 0; i < Nx; i+=2)

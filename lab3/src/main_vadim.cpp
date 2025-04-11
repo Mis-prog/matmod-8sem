@@ -4,7 +4,8 @@
 #include <string>
 #include <iomanip>
 #include <chrono>
-#include <Eigen\Sparse>
+#include <Eigen/Core>
+#include <Eigen/Sparse>
 
 
 #define Pi 3.14159265
@@ -465,8 +466,7 @@ private:
 
 	double phi(double y)
 	{
-		return y*(1-y);
-		//return y * (1 - y) * (0.5 - y) * (0.5 - y);
+		return y * (1 - y) * (0.5 - y) * (0.5 - y);
 	}
 	double k2_val(double y)
 	{
@@ -484,7 +484,7 @@ private:
 };
 
 void do_exp_eigen(unsigned N1, unsigned M, double L, double x_PML,
-	double y_0, double k_0, double eps, std::string fname)
+	double y_0, double k_0, double eps, std::string fname = "../lab3/src/result_vadim/")
 {
 	System s(N1, M, L, x_PML, y_0, k_0, eps);
 	unsigned N = s.N;
@@ -506,7 +506,7 @@ void do_exp_eigen(unsigned N1, unsigned M, double L, double x_PML,
 	Eigen::VectorXd X = s.solve();
 
 	std::ofstream fout;
-	fout.open("la" + "_eigen_data.txt");
+	fout.open(fname + "_eigen_data.txt");
 	fout << N1 << " " << M << " " << L << " " << x_PML << " " << y_0 << " " << k_0 << " " << eps << "\n";
 	fout.close();
 
