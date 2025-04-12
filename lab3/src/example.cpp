@@ -2,6 +2,10 @@
 #include "rustem/lib_rustem.h"  // расскоментировать, если хотите запустить код Рустема, при этом добавте дирикторию в CMake
 
 
+
+#include <chrono>
+
+
 // #include  "vadim/lib_vadim.h"
 
 using namespace std;
@@ -10,18 +14,81 @@ namespace rustem {
     int Nx = 1000;
     int Ny = 500;
     double L = 10;
-    double Lpml = 0;
+    double Lpml = 5;
     double k = 10;
-    double eps = 0;
+    double eps = 0.0;
     double ynull = 0.5;
     int iter = 0;
+
     void run() {
         LIB lib(Nx, Ny, L, Lpml, ynull, k, eps);
         lib.calc(iter);
     }
 
     void run_full() {
+        // c PML
+        {
+            auto start = std::chrono::high_resolution_clock::now();
+            LIB lib(Nx, Ny, L, Lpml, ynull, k, eps);
+            lib.calc(iter);
+            auto stop = std::chrono::high_resolution_clock::now();
+            auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start);
+            std::cout << ":: " << duration.count() << " seconds\n";
+            iter++;
+        }
+        // без PML
+        {
+            Lpml = 0;
+            auto start = std::chrono::high_resolution_clock::now();
+            LIB lib(Nx, Ny, L, Lpml, ynull, k, eps);
+            lib.calc(iter);
+            auto stop = std::chrono::high_resolution_clock::now();
+            auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start);
+            std::cout << ":: " << duration.count() << " seconds\n";
+            iter++;
+        }
+        // Параметр k
+        std::vector<double> k_vals{10, 15, 20, 25};
+        for (int i = 0; i < k_vals.size(); i++) {
+            Lpml = 5;
+            k = k_vals[i];
+            auto start = std::chrono::high_resolution_clock::now();
+            LIB lib(Nx, Ny, L, Lpml, ynull, k, eps);
+            lib.calc(iter);
+            auto stop = std::chrono::high_resolution_clock::now();
+            auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start);
+            std::cout << "k = " << k << " :: " << duration.count() << " seconds\n";
+            iter++;
+        }
 
+        std::vector<double> eps_vals{0, 1e-5, 1e-2, 0.5, 1};
+        for (int i = 0; i < k_vals.size(); i++) {
+            Lpml = 5;
+            k = 10;
+            eps = eps_vals[i];
+            auto start = std::chrono::high_resolution_clock::now();
+            LIB lib(Nx, Ny, L, Lpml, ynull, k, eps);
+            lib.calc(iter);
+            auto stop = std::chrono::high_resolution_clock::now();
+            auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start);
+            std::cout << "eps = " << eps << " :: " << duration.count() << " seconds\n";
+            iter++;
+        }
+
+        std::vector<double> y0_vals{0.1, 0.3, 0.5, 0.7, 0.9};
+        for (int i = 0; i < k_vals.size(); i++) {
+            Lpml = 5;
+            k = 10;
+            eps = 0.01;
+            ynull = y0_vals[i];
+            auto start = std::chrono::high_resolution_clock::now();
+            LIB lib(Nx, Ny, L, Lpml, ynull, k, eps);
+            lib.calc(iter);
+            auto stop = std::chrono::high_resolution_clock::now();
+            auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start);
+            std::cout << "ynull = " << ynull << " :: " << duration.count() << " seconds\n";
+            iter++;
+        }
     }
 } // расскоментировать, если хотите запустить код Рустема
 
@@ -86,7 +153,6 @@ namespace rustem {
 // }
 
 int main() {
-    // vadim::run();
     rustem::run();
     return 0;
 }

@@ -70,7 +70,6 @@ int LIB::calc(int iter) {
         for (int i = 1; i < Nx; i++)
             for (int j = 1; j < Ny; j++) {
                 int in = id(i, j);
-
                 triplets.push_back(Eigen::Triplet<double>(in, id(i, j),
                                                           (-2 / (hx * hx) - 2 / (hy * hy)) + k * k * (1 + eps * fi(
                                                                   j * hy))));
@@ -80,7 +79,7 @@ int LIB::calc(int iter) {
                 triplets.push_back(Eigen::Triplet<double>(in, id(i, j + 1), 1 / (hy * hy)));
             }
         for (int j = 1; j < Ny; j++) {
-            f(id(0, j)) = Fz((j * hy - ynull) / hy) / 10.0;
+            f(id(0, j)) = Fz((j * hy - ynull) / hy) / 0.1;
             triplets.push_back(Eigen::Triplet<double>(id(0, j), id(0, j), 1));
         }
         for (int i = 0; i < Nx + 1; i++) {
@@ -95,6 +94,14 @@ int LIB::calc(int iter) {
                 f(id(Nx, j)) = 0; // Условие Дирихле
                 triplets.push_back(Eigen::Triplet<double>(id(Nx, j), id(Nx, j), 1));
             }
+            // условие неймана
+            // triplets.push_back(Eigen::Triplet<double>(in, id(Nx, j),
+            //                                                   (-2 / (hx * hx) - 2 / (hy * hy)) + k * k * (1 + eps * fi(
+            //                                                           j * hy))));
+            // triplets.push_back(Eigen::Triplet<double>(in, id(Nx - 1, j), 2 / (hx * hx)));
+            // // Изменено: 2 / hx^2 * u(Nx-1, j)
+            // triplets.push_back(Eigen::Triplet<double>(in, id(Nx, j - 1), 1 / (hy * hy)));
+            // triplets.push_back(Eigen::Triplet<double>(in, id(Nx, j + 1), 1 / (hy * hy)));
         }
 
         if (Nl > 0) {
@@ -111,23 +118,29 @@ int LIB::calc(int iter) {
                     int id1 = id(i, j, 0);
                     int id2 = id(i, j, 1);
                     triplets.push_back(Eigen::Triplet<double>(id1, id(i, j, 0),
-                                                              (-2 * a / (hx * hx) - 2 / (hy * hy) + k * k * (1 + eps *
+                                                              (-2 * a / (hx * hx) - 2 / (hy * hy) + k * k * (
+                                                                   1 + eps *
                                                                    fi(
                                                                        j * hy)))));
-                    triplets.push_back(Eigen::Triplet<double>(id1, id(i - 1, j, 0), (a / (hx * hx) + c / (2 * hx))));
-                    triplets.push_back(Eigen::Triplet<double>(id1, id(i + 1, j, 0), (a / (hx * hx) - c / (2 * hx))));
+                    triplets.push_back(
+                        Eigen::Triplet<double>(id1, id(i - 1, j, 0), (a / (hx * hx) + c / (2 * hx))));
+                    triplets.push_back(
+                        Eigen::Triplet<double>(id1, id(i + 1, j, 0), (a / (hx * hx) - c / (2 * hx))));
                     triplets.push_back(Eigen::Triplet<double>(id1, id(i, j - 1, 0), (1 / (hy * hy))));
                     triplets.push_back(Eigen::Triplet<double>(id1, id(i, j + 1, 0), (1 / (hy * hy))));
                     //////
                     triplets.push_back(Eigen::Triplet<double>(id1, id(i, j, 1), (-2 * -b / (hx * hx))));
-                    triplets.push_back(Eigen::Triplet<double>(id1, id(i - 1, j, 1), (-b / (hx * hx) - d / (2 * hx))));
-                    triplets.push_back(Eigen::Triplet<double>(id1, id(i + 1, j, 1), (-b / (hx * hx) + d / (2 * hx))));
+                    triplets.push_back(
+                        Eigen::Triplet<double>(id1, id(i - 1, j, 1), (-b / (hx * hx) - d / (2 * hx))));
+                    triplets.push_back(
+                        Eigen::Triplet<double>(id1, id(i + 1, j, 1), (-b / (hx * hx) + d / (2 * hx))));
                     //////
                     if (i > 1) {
                         triplets.push_back(Eigen::Triplet<double>(id2, id(i, j, 1),
-                                                                  (-2 * a / (hx * hx) - 2 / (hy * hy) + k * k * (1 + eps
-                                                                       *
-                                                                       fi(j * hy)))));
+                                                                  (-2 * a / (hx * hx) - 2 / (hy * hy) + k * k *
+                                                                   (1 + eps
+                                                                    *
+                                                                    fi(j * hy)))));
                         triplets.push_back(
                             Eigen::Triplet<double>(id2, id(i - 1, j, 1), (a / (hx * hx) + c / (2 * hx))));
                         triplets.push_back(
@@ -198,7 +211,7 @@ int LIB::calc(int iter) {
     ofstream data("../lab3/result_my/data_" + to_string(iter) + ".txt");
     data << "Nx = " << Nx << " ,Ny = " << Ny << " ,Nl = " << Nl <<
             ", y0 =" << ynull << " ,k = " << k << " ,eps = " << eps
-            << " ,L = " << L << " ,Lpml" << Lpml << std::endl;
+            << " ,L = " << L << " ,Lpml = " << Lpml << std::endl;
     data.close();
 
     ofstream z("../lab3/result_my/z_" + to_string(iter) + ".txt");
