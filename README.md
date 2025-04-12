@@ -1,41 +1,32 @@
-Лабораторные по математическому моделированию за 8 семестр
-----------------
-### Лабораторные работы за 2025 год, ПМ-457
+# 📊 Лабораторные по математическому моделированию (8 семестр)
 
-### Cборка 1 ЛР
-```
+**Группа:** ПМ-457  
+**Год:** 2025  
+**Автор:** [Миша](@graf_de_len), [Aлия](@alia_gz)  
+**Платформа:** Windows (через Cygwin)
+
+---
+
+## 🗂 Структура проекта
+
+Каждая лабораторная работа размещена в своей директории:
+
+- `lab1/misha` — Лабораторная работа №1 (C++)
+- `lab2/misha` — Лабораторная работа №2 (Python)
+- `lab3/src`   — Лабораторная работа №3 (C++)
+- `lab4/misha` — Лабораторная работа №4 (C++ + Python)
+
+Сборка C++-проектов производится с использованием CMake. Python-проекты используют виртуальное окружение и зависимости из `requirements.txt`.
+
+---
+
+## ⚙️ Сборка и запуск
+
+### 🧪 Лабораторная работа 1 (C++)
+
+```bash
 mkdir build && cd build
-cmake .. 
+cmake ..
 cmake --build . --config Release -t lab1_misha_v2
 ./lab1/misha/lab1_misha_v2
 ```
-### Cборка 2 ЛР
-Выполнялась на питончике. Код находится в папке [lab2](/lab2/misha)
-
-
-### Cборка 3 ЛР
-```
-mkdir build && cd build
-cmake .. 
-cmake --build . --config Release -t lab3_misha
-./lab3/misha/lab3_misha
-```
-
-### Сборка 4 ЛР
-1. Первое задание
-  ```
-  mkdir build && cd build
-  cmake .. 
-  cmake --build . --config Release -t lab4_misha
-  ./lab4/misha/lab4_misha
-  ```
-2. Второе задание 
-  ```
-  cd lab4/misha/
-  source bin/Scripts/activate
-  pip install -r requirements.txt
-  python main_part3.py
-  ```
-
-### Информация
-Подробно проект описан в Wiki
