@@ -30,7 +30,6 @@ plt.grid(True)
 plt.title('Проекция на ZY')
 plt.show()
 
-print(x[:1000])
 
 # for i in range(Ny):
 #     plt.plot(x, data[i, :], color='blue')
