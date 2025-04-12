@@ -21,6 +21,10 @@ System::System(unsigned N1, unsigned M, double L, double x_PML,
     N = std::floor(x_PML / hx); // the right hand side-vector resulting from the constraints
 }
 
+void System::set_pml(int n_pml) {
+    this->n_pml = n_pml;
+}
+
 unsigned System::ReIdx(unsigned i, unsigned j) {
     return 2 * ((i - 1) + (j - 1) * (N - 1));
 }
@@ -467,26 +471,26 @@ double System::k_val(double y) {
     return k_0 * std::sqrt(1 + eps * phi(y));
 }
 
-double System::a_val(double x, double y) {
-    double sigma = 100.0;
-    return sigma * k_val(y) * (x_PML - x);
-}
-
 // double System::a_val(double x, double y) {
-//     double sigma_max = 1.0; // Максимальное значение поглощения (можно настроить)
-//     double x_start_pml = this->x(this->N1); // Начало PML
-//     double L_pml = this->x_PML - x_start_pml; // Толщина PML
-//
-//     // Нормированное расстояние от начала PML (от 0 до 1)
-//     double xi = (x - x_start_pml) / L_pml;
-//
-//     // Квадратичный профиль
-//     return sigma_max * this->k_val(y) * xi * xi;
+//     return k_val(y) * pow((x_PML - x), n_pml);
 // }
 
+
+double System::a_val(double x, double y) {
+    if (x < x_PML) return 0.0;
+
+    double d = (x - x_PML) / (L - x_PML);
+    double k = k_val(y);
+
+    // Комбинация линейного и квадратичного профилей
+    return k * (1.0 * d + 3.0 * d * d);
+}
+
+
 void do_exp_eigen(unsigned N1, unsigned M, double L, double x_PML,
-                  double y_0, double k_0, double eps, std::string fname) {
+                  double y_0, double k_0, double eps, double n_pml, std::string fname) {
     System s(N1, M, L, x_PML, y_0, k_0, eps);
+    s.set_pml(n_pml);
     unsigned N = s.N;
     std::cout << s.N1 << "(" << s.N << ") " << s.M << "\n";
     //s.print_matrix();

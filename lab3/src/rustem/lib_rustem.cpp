@@ -54,7 +54,7 @@ int LIB::id(int i, int j, int l) {
 }
 
 
-int LIB::calc() {
+int LIB::calc(int iter) {
     double hy = 1.0 / Ny;
     double hx = L / Nx;
     int Nl = (Lpml < 1e-10) ? 0 : int(Lpml / hx);
@@ -80,7 +80,7 @@ int LIB::calc() {
                 triplets.push_back(Eigen::Triplet<double>(in, id(i, j + 1), 1 / (hy * hy)));
             }
         for (int j = 1; j < Ny; j++) {
-            f(id(0, j)) = Fz((j * hy - ynull) / hy) / hy;
+            f(id(0, j)) = Fz((j * hy - ynull) / hy) / 10.0;
             triplets.push_back(Eigen::Triplet<double>(id(0, j), id(0, j), 1));
         }
         for (int i = 0; i < Nx + 1; i++) {
@@ -195,22 +195,13 @@ int LIB::calc() {
     }
     Eigen::MatrixXd sol = solver.solve(f);
 
+    ofstream data("../lab3/result_my/data_" + to_string(iter) + ".txt");
+    data << "Nx = " << Nx << " ,Ny = " << Ny << " ,Nl = " << Nl <<
+            ", y0 =" << ynull << " ,k = " << k << " ,eps = " << eps
+            << " ,L = " << L << " ,Lpml" << Lpml << std::endl;
+    data.close();
 
-    std::ostringstream filename;
-    if (Lpml > 1e-10) {
-        if (eps < 1e-10) {
-            filename << "../lab3/src/result/result" << k << "y0" << std::fixed << std::setprecision(2) << ynull <<
-                    ".txt";
-        } else {
-            filename << "../lab3/src/result/result" << k << "y0" << std::fixed << std::setprecision(2) << ynull
-                    << "eps" <<  std::fixed << std::setprecision(10) << eps << ".txt";
-        }
-    } else {
-        filename << "../lab3/src/result/result_not_pml" << k << "y0" << std::fixed << std::setprecision(2) << ynull <<
-                ".txt";
-    }
-    ofstream file(filename.str());
-
+    ofstream z("../lab3/result_my/z_" + to_string(iter) + ".txt");
     for (int j = 0; j < Ny + 1; j += 1) {
         // for (int i = 0; i < Nx + 1; i += 1)
         // {
@@ -218,7 +209,7 @@ int LIB::calc() {
         // }
 
         for (int i = 0; i < Nx + 1; i += 1) {
-            file << sol(id(i, j)) << " ";
+            z << sol(id(i, j)) << " ";
         }
 
         // for (int i = 0; i < Nl + 1; i += 1) {
@@ -227,11 +218,32 @@ int LIB::calc() {
 
         if (Nl > 0) {
             for (int i = 0; i < Nl + 1; i += 1) {
-                file << sol(id(i, j, 0)) << " ";
+                z << sol(id(i, j, 0)) << " ";
             }
         }
-        file << endl;
+        z << endl;
     }
-    file.close();
+    z.close();
+
+    ofstream x("../lab3/result_my/x_" + to_string(iter) + ".txt");
+    for (int i = 0; i < Nx + 1; i += 1) {
+        x << i * hx << " "; // Основная область: x = 0, hx, 2hx, ..., L
+    }
+    if (Nl > 0) {
+        for (int i = 0; i < Nl + 1; i += 1) {
+            x << L + i * hx << " "; // PML: x = L, L+hx, ..., L+Nl*hx
+        }
+    }
+    x << endl;
+    x.close();
+
+    // Вывод y-координат (опционально)
+    ofstream y("../lab3/result_my/y_" + to_string(iter) + ".txt");
+    for (int j = 0; j < Ny + 1; j += 1) {
+        y << j * hy << " ";
+    }
+    y << endl;
+    y.close();
+
     return 0;
 }

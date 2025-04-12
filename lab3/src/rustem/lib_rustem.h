@@ -14,6 +14,7 @@
 #include <fstream>
 #include <sstream>
 #include <iomanip>
+#include <string>
 
 #define Pi 3.1415926535
 
@@ -28,14 +29,19 @@ public:
 
     // Методы класса
     double Fz(double y);
+
     std::complex<double> _gamma(double x);
+
     std::complex<double> dgamma(double x);
+
     double fi(double y);
+
     int id(int i, int j);
+
     int id(int i, int j, int l);
 
     // Метод для расчета
-    int calc();
+    int calc(int iter);
 };
 
 #endif // MY_HEADER_H

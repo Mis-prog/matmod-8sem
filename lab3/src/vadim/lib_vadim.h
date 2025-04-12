@@ -40,6 +40,7 @@ public:
     double y_0 = 0.35;
     double hx;
     double hy;
+    double n_pml = 2;
 
     std::vector<Trip> coefficients; // list of non-zeros coefficients
     Eigen::VectorXd B; // the right hand side-vector resulting from the constraints
@@ -48,6 +49,8 @@ public:
 
     System(unsigned N1, unsigned M, double L, double x_PML,
            double y_0, double k_0, double eps);
+
+    void set_pml(int n_pml);
 
     unsigned ReIdx(unsigned i, unsigned j);
 
@@ -69,4 +72,4 @@ public:
 };
 
 void do_exp_eigen(unsigned N1, unsigned M, double L, double x_PML,
-                  double y_0, double k_0, double eps, std::string fname);
+                  double y_0, double k_0, double eps, double n_pml, std::string fname);
