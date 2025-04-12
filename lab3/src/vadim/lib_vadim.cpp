@@ -468,9 +468,21 @@ double System::k_val(double y) {
 }
 
 double System::a_val(double x, double y) {
-    double sigma = 10.0;
+    double sigma = 100.0;
     return sigma * k_val(y) * (x_PML - x);
 }
+
+// double System::a_val(double x, double y) {
+//     double sigma_max = 1.0; // Максимальное значение поглощения (можно настроить)
+//     double x_start_pml = this->x(this->N1); // Начало PML
+//     double L_pml = this->x_PML - x_start_pml; // Толщина PML
+//
+//     // Нормированное расстояние от начала PML (от 0 до 1)
+//     double xi = (x - x_start_pml) / L_pml;
+//
+//     // Квадратичный профиль
+//     return sigma_max * this->k_val(y) * xi * xi;
+// }
 
 void do_exp_eigen(unsigned N1, unsigned M, double L, double x_PML,
                   double y_0, double k_0, double eps, std::string fname) {

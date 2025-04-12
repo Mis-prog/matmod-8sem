@@ -19,4 +19,5 @@ ax1.plot_surface(X, Y, z, cmap='plasma')
 ax2 = fig.add_subplot(122)
 for i in range(len(y)):
     ax2.plot(x, z[i, :], c='b')
+# ax2.set_ylim([-0.05, 0.1])
 plt.show()
