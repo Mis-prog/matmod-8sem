@@ -584,7 +584,7 @@ int main() {
     double k_0 = 10;
     double y_0 = 0.5;
 
-    double x_PML = 0 * L;
+    double x_PML = 1.1 * L;
     unsigned N1 = 1000;
     unsigned M = 400;
 

@@ -1,7 +1,6 @@
 #include "lib_vadim.h"
 
 
-
 System::System(unsigned N1, unsigned M, double L, double x_PML,
                double y_0, double k_0, double eps)
     : N1(N1), M(M), L(L),
@@ -469,7 +468,8 @@ double System::k_val(double y) {
 }
 
 double System::a_val(double x, double y) {
-    return k_val(y) * (x_PML - x);
+    double sigma = 10.0;
+    return sigma * k_val(y) * (x_PML - x);
 }
 
 void do_exp_eigen(unsigned N1, unsigned M, double L, double x_PML,
@@ -488,6 +488,8 @@ void do_exp_eigen(unsigned N1, unsigned M, double L, double x_PML,
     }*/
 
     s.fillAB();
+
+    std::cout << "! The system is compiled !\n";
     //s.print_matrix();
 
     // Solving
