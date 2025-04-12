@@ -1,4 +1,4 @@
-#include "main_lib.h"
+#include "lib_rustem.h"
 
 #include "Eigen/src/Core/Matrix.h"
 #include "Eigen/src/SparseCore/SparseMatrix.h"

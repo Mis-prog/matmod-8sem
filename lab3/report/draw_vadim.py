@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-i = 1
+i = 0
 data = np.loadtxt(f'../result_my/{i}_eigen_data.txt')
 
 x = np.loadtxt(f'../result_my/{i}_eigen_X.txt')
