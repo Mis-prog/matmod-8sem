@@ -5,8 +5,7 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QHBoxLayout, QVBoxLayout
 import sys
 from PyQt5.QtCore import QTimer
 from PyQt5.QtCore import Qt
-from View import View
-from View2 import View2
+
 from View3 import View3
 from View4 import View4
 
@@ -21,17 +20,17 @@ ACTIVE, TAKT = [], []
 class Window(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.title = "MyProject"
+        self.title = "LAB2"
         self.top = 150
         self.left = 150
-        self.width = 800
-        self.height = 800
+        self.width = 900
+        self.height = 900
         self.InitWindow()
-        self.view = View3(self.width, self.height) #3 задание
-        # self.view=View4(self.width,self.height)  # 4 задание
+        self.view = View4(self.width, self.height, N = 256) #3 задание
+        # self.view=View4(self.width,self.height, N=256)  # 4 задание
         self.timer = QTimer()
         self.timer.timeout.connect(self.showTime)
-        self.timer.start(100)
+        self.timer.start(50)
         self.count = 0
         # self.setLayout(layout)
         self.setCentralWidget(self.view)
@@ -42,14 +41,16 @@ class Window(QMainWindow):
         self.show()
 
     def showTime(self):
-        print("Живых клеток: ", self.view.countAliveCells())
+        alive, dead = self.view.countAliveCells()
+        print(f"Живых клеток: {alive}, Мёртвых клеток: {dead}")
         self.view.showTime(self.count)
         self.count += 1
         TAKT.append(self.count)
-        ACTIVE.append(self.view.countAliveCells())
+        ACTIVE.append(alive)
         self.update()
 
-        if self.count >= 50:
+    def mousePressEvent(self, event):
+        if event.button() == Qt.RightButton:
             self.timer.stop()
             self.plot_graph()
 

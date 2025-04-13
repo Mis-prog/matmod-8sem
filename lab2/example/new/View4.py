@@ -116,8 +116,8 @@ class View4(QWidget):
         print(count)
         self.action()
         self.update()
-        # if count %10==0 and count>0:
-        #     time.sleep(10)
+        if count %10==0 and count>0:
+            time.sleep(10)
 
 
     def paintEvent(self, event):
@@ -130,15 +130,8 @@ class View4(QWidget):
                 if self.cells_state[i][j] == 0:
                     color = Qt.white
                 if self.cells_state[i][j] == 1:
-                    color = Qt.yellow
+                    color = Qt.blue
                 painter.setBrush(QBrush(color, Qt.SolidPattern))
                 painter.setPen(QPen(color, 1, Qt.SolidLine))
                 painter.drawRect(j * h, i * h, h, h)
         # painter.drawRect(20, 20, 100, 100)
-    def countAliveCells(self):
-        count = 0
-        for i in range(self.N):
-            for j in range(self.N):
-                if self.cells_state[i][j] == 1:
-                    count += 1
-        return count
