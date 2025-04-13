@@ -15,10 +15,10 @@ namespace rustem {
     int Ny = 500;
     double L = 10;
     double Lpml = 5;
-    double k = 10;
+    double k = 17;
     double eps = 0.0;
     double ynull = 0.5;
-    int iter = 0;
+    int iter = 21;
 
     void run() {
         LIB lib(Nx, Ny, L, Lpml, ynull, k, eps);
@@ -48,7 +48,7 @@ namespace rustem {
             iter++;
         }
         // Параметр k
-        std::vector<double> k_vals{10, 15, 20, 25};
+        std::vector<double> k_vals{5, 10, 15, 20};
         for (int i = 0; i < k_vals.size(); i++) {
             Lpml = 5;
             k = k_vals[i];
@@ -61,7 +61,7 @@ namespace rustem {
             iter++;
         }
 
-        std::vector<double> eps_vals{0, 1e-5, 1e-2, 0.5, 1};
+        std::vector<double> eps_vals{0, 1e-5, 1e-2, 1};
         for (int i = 0; i < k_vals.size(); i++) {
             Lpml = 5;
             k = 10;
@@ -153,6 +153,7 @@ namespace rustem {
 // }
 
 int main() {
+    // rustem::run_full();
     rustem::run();
     return 0;
 }

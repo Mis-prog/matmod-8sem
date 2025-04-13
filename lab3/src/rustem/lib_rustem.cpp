@@ -79,7 +79,7 @@ int LIB::calc(int iter) {
                 triplets.push_back(Eigen::Triplet<double>(in, id(i, j + 1), 1 / (hy * hy)));
             }
         for (int j = 1; j < Ny; j++) {
-            f(id(0, j)) = Fz((j * hy - ynull) / hy) / 0.1;
+            f(id(0, j)) = Fz((j * hy - ynull) / hy) / 0.05;
             triplets.push_back(Eigen::Triplet<double>(id(0, j), id(0, j), 1));
         }
         for (int i = 0; i < Nx + 1; i++) {
@@ -208,13 +208,13 @@ int LIB::calc(int iter) {
     }
     Eigen::MatrixXd sol = solver.solve(f);
 
-    ofstream data("../lab3/result_my/data_" + to_string(iter) + ".txt");
+    ofstream data("../lab3/result_alia/data_" + to_string(iter) + ".txt");
     data << "Nx = " << Nx << " ,Ny = " << Ny << " ,Nl = " << Nl <<
             ", y0 =" << ynull << " ,k = " << k << " ,eps = " << eps
             << " ,L = " << L << " ,Lpml = " << Lpml << std::endl;
     data.close();
 
-    ofstream z("../lab3/result_my/z_" + to_string(iter) + ".txt");
+    ofstream z("../lab3/result_alia/z_" + to_string(iter) + ".txt");
     for (int j = 0; j < Ny + 1; j += 1) {
         // for (int i = 0; i < Nx + 1; i += 1)
         // {
@@ -238,7 +238,7 @@ int LIB::calc(int iter) {
     }
     z.close();
 
-    ofstream x("../lab3/result_my/x_" + to_string(iter) + ".txt");
+    ofstream x("../lab3/result_alia/x_" + to_string(iter) + ".txt");
     for (int i = 0; i < Nx + 1; i += 1) {
         x << i * hx << " "; // Основная область: x = 0, hx, 2hx, ..., L
     }
@@ -251,7 +251,7 @@ int LIB::calc(int iter) {
     x.close();
 
     // Вывод y-координат (опционально)
-    ofstream y("../lab3/result_my/y_" + to_string(iter) + ".txt");
+    ofstream y("../lab3/result_alia/y_" + to_string(iter) + ".txt");
     for (int j = 0; j < Ny + 1; j += 1) {
         y << j * hy << " ";
     }
