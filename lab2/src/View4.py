@@ -1,15 +1,15 @@
-from PyQt5 import QtGui
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QHBoxLayout, QVBoxLayout, QWidget,
+from PyQt6 import QtGui
+from PyQt6.QtWidgets import (QApplication, QMainWindow, QHBoxLayout, QVBoxLayout, QWidget,
                              )
 import time
 import sys
 import math
 import random
-from PyQt5.QtGui import QPainter, QBrush, QPen
-from PyQt5 import QtCore
-from PyQt5.QtCore import QTimer, QDateTime
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QColor
+from PyQt6.QtGui import QPainter, QBrush, QPen
+from PyQt6 import QtCore
+from PyQt6.QtCore import QTimer, QDateTime
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QColor
 from copy import copy, deepcopy
 
 pmax = 10
@@ -27,7 +27,7 @@ class View4(QWidget):
     def __init__(self, width, height, N=256):
         super().__init__()
         self.setAutoFillBackground(True)
-        self.setAttribute(Qt.WA_OpaquePaintEvent)
+        self.setAttribute(Qt.WidgetAttribute.WA_OpaquePaintEvent)
         self.title = "PyQt5 Drawing Tutorial"
         self.top = 150
         self.left = 150
@@ -36,7 +36,14 @@ class View4(QWidget):
         self.InitWindow()
         self.N = N
         self.source = 0
-        self.colors = [Qt.red, Qt.green, Qt.blue, Qt.yellow, Qt.black, Qt.gray]
+        self.colors = [
+            Qt.GlobalColor.red,
+            Qt.GlobalColor.green,
+            Qt.GlobalColor.blue,
+            Qt.GlobalColor.yellow,
+            Qt.GlobalColor.black,
+            Qt.GlobalColor.gray
+        ]
         self.cells_state = [[0] * self.N for i in range(self.N)]
         self.p = [[pmax] * self.N for i in range(self.N)]
         self.e = [[0] * self.N for i in range(self.N)]
@@ -49,7 +56,7 @@ class View4(QWidget):
         # self.cells_state[17][15] = 1
         # self.cells_state[17][16] = 1
         for i in range(int(A * N * N)):
-            self.cells_state[random.randint(0, int((self.N - 1)*0.5))][random.randint(0, int((self.N - 1) * 1))] = 1
+            self.cells_state[random.randint(0, int((self.N - 1)*0.7))][random.randint(0, int((self.N - 1) * 1))] = 1
 
     def InitWindow(self):
         self.setWindowTitle(self.title)
@@ -133,17 +140,17 @@ class View4(QWidget):
         font.setBold(True)  # жирность
         painter.setFont(font)
         # painter.setPen(QPen(Qt.white, 1, Qt.SolidLine))
-        painter.setBrush(QBrush(Qt.green, Qt.SolidPattern))
+        painter.setBrush(QBrush(Qt.GlobalColor.green, Qt.BrushStyle.SolidPattern))
         h = int(min(self.width, self.height) / self.N)
         for i in range(self.N):
             for j in range(self.N):
                 if self.cells_state[i][j] == 0:
-                    color = Qt.white
+                    color = Qt.GlobalColor.white
                 if self.cells_state[i][j] == 1:
-                    color = Qt.yellow
-                painter.setBrush(QBrush(color, Qt.SolidPattern))
-                painter.setPen(QPen(color, 1, Qt.SolidLine))
-                painter.setPen(QPen(Qt.black, 0.2, Qt.SolidLine))
+                    color = Qt.GlobalColor.yellow
+                painter.setBrush(QBrush(color, Qt.BrushStyle.SolidPattern))
+                painter.setPen(QPen(color, 1,  Qt.PenStyle.SolidLine))
+                painter.setPen(QPen(Qt.GlobalColor.black, 0.2,  Qt.PenStyle.SolidLine))
                 painter.drawRect(j * h, i * h, h, h)
         self.drawInfo(painter)
         # painter.drawRect(20, 20, 100, 100)
@@ -160,5 +167,5 @@ class View4(QWidget):
     def drawInfo(self, painter):
         alive, dead = self.countAliveCells()
         text = f"Такт: {self.count} | Живые: {alive} | Мёртвые: {dead}"
-        painter.setPen(Qt.black)
+        painter.setPen(Qt.GlobalColor.black)
         painter.drawText(20, 20, text)

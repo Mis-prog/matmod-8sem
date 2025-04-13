@@ -1,10 +1,10 @@
 from importlib import import_module
 
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QHBoxLayout, QVBoxLayout, QWidget,
+from PyQt6.QtWidgets import (QApplication, QMainWindow, QHBoxLayout, QVBoxLayout, QWidget,
                              )
 import sys
-from PyQt5.QtCore import QTimer
-from PyQt5.QtCore import Qt
+from PyQt6.QtCore import QTimer
+from PyQt6.QtCore import Qt
 
 from View3 import View3
 from View4 import View4
@@ -26,7 +26,7 @@ class Window(QMainWindow):
         self.width = 900
         self.height = 900
         self.InitWindow()
-        self.view = View4(self.width, self.height, N = 256) #3 задание
+        self.view = View3(self.width, self.height, N = 256) #3 задание
         # self.view=View4(self.width,self.height, N=256)  # 4 задание
         self.timer = QTimer()
         self.timer.timeout.connect(self.showTime)
@@ -50,7 +50,7 @@ class Window(QMainWindow):
         self.update()
 
     def mousePressEvent(self, event):
-        if event.button() == Qt.RightButton:
+        if event.button() == Qt.MouseButton.RightButton:
             self.timer.stop()
             self.plot_graph()
 
