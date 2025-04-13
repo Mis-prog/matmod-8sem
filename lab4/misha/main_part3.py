@@ -2,6 +2,7 @@ import numpy as np
 from scipy.integrate import solve_ivp
 import matplotlib.pyplot as plt
 from tqdm import tqdm
+import math
 
 
 def blasius_eq(eta, y):
@@ -53,10 +54,18 @@ def v_velocity(eta, x):
     return 0.5 * np.sqrt(U * nu / x) * (eta * fp_interp - f_interp)
 
 
-x_vals = np.linspace(0, 2, int(2e4), dtype=np.float32)
-fou, Ly, Ny = 10, 1, int(5e3)
-j_vals = np.arange(Ny, dtype=np.float32)
-y_vals = (fou ** (j_vals / Ny) * Ly - Ly) / (fou - 1)
+x_vals = []
+fou, Ly, Ny, Nx, hx = 10, 1, int(5e3), int(2e4), 0.0001
+for i in range(1, Nx + 1):
+    x_vals.append(i * hx)
+x_vals = np.array(x_vals)
+y_vals = []
+for j in range(1, Ny - 1):
+    y_j = (pow(fou, (j * 1.0 / Ny)) * Ly - Ly) / (fou - 1)
+    y_j_left = (pow(fou, ((j - 1) * 1.0 / Ny)) * Ly - Ly) / (fou - 1)
+    y_j_right = (pow(fou, ((j + 1) * 1.0 / Ny)) * Ly - Ly) / (fou - 1)
+    y_vals.append(y_j)
+y_vals = np.array(y_vals)
 X, Y = np.meshgrid(x_vals, y_vals)
 X = X.astype(np.float32)
 Y = Y.astype(np.float32)
@@ -74,9 +83,8 @@ indices = np.searchsorted(eta_vals, eta_flat, side='left')
 indices = np.clip(indices, 0, len(eta_vals) - 1)
 
 # Используем значения f и fp без интерполяции
-fp_vals = fp[indices]
-f_vals = f[indices]
-
+fp_vals = np.interp(eta_flat, eta_vals, fp)
+f_vals = np.interp(eta_flat, eta_vals, f)
 # Вычисление u и v
 U_flat = U * fp_vals
 V_flat = 0.5 * np.sqrt(U * nu / (X_flat)) * (eta_flat * fp_vals - f_vals)
@@ -85,9 +93,8 @@ V_flat = 0.5 * np.sqrt(U * nu / (X_flat)) * (eta_flat * fp_vals - f_vals)
 U_field = U_flat.reshape(X.shape)
 V_field = V_flat.reshape(X.shape)
 
-
 threshold = 2
-epsilon = 5e-6
+epsilon = 2e-6
 
 mask = U_field >= (threshold - epsilon)
 
@@ -108,16 +115,14 @@ for j in range(U_field.shape[1]):  # Перебор всех столбцов
 
 np.savetxt("result/first_values.csv", results, delimiter=",", header="x,y,U", comments="")
 
-
 np.save("result/U_field.npy", U_field[::2, ::2])
 np.save("result/V_field.npy", V_field[::2, ::2])
 
-y_vals = np.linspace(0, Ly, Ny)
 X, Y = np.meshgrid(x_vals, y_vals)
 
 X = X.astype(np.float32)
 Y = Y.astype(np.float32)
-stepX, stepY = 1, 600
+stepX, stepY = 10, 600
 plt.figure(figsize=(10, 6))
 plt.quiver(X[::stepX, ::stepY], Y[::stepX, ::stepY], U_field[::stepX, ::stepY], V_field[::stepX, ::stepY], scale=100,
            color='b')
