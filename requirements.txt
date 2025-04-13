@@ -7,4 +7,5 @@ pandas
 pyDOE2
 scipy
 PyQt5
+PyQt6
 plotly
