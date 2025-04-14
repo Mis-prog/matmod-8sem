@@ -147,12 +147,12 @@ class View4(QWidget):
                 if self.cells_state[i][j] == 0:
                     color = Qt.GlobalColor.white
                 if self.cells_state[i][j] == 1:
-                    color = Qt.GlobalColor.yellow
+                    color = Qt.GlobalColor.green
                 painter.setBrush(QBrush(color, Qt.BrushStyle.SolidPattern))
                 painter.setPen(QPen(color, 1,  Qt.PenStyle.SolidLine))
                 painter.setPen(QPen(Qt.GlobalColor.black, 0.2,  Qt.PenStyle.SolidLine))
                 painter.drawRect(j * h, i * h, h, h)
-        self.drawInfo(painter)
+        # self.drawInfo(painter)
         # painter.drawRect(20, 20, 100, 100)
 
     def countAliveCells(self):
