@@ -75,7 +75,7 @@ print("Текущая рабочая директория:", os.getcwd())
 #eps0 1 20 ynull = 0.5 100 101 102
 #eps1  ynull 0.7  200 201
 #eps 20 300
-iter = 302
+iter = 202
 Z = np.loadtxt(f'../result_my/z_{iter}.txt')
 x = np.loadtxt(f'../result_my/x_{iter}.txt')
 y = np.loadtxt(f'../result_my/y_{iter}.txt')

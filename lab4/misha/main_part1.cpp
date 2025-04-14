@@ -9,6 +9,10 @@ using namespace std;
 
 constexpr int Lx = 2, Ly = 1, Ny = 5000;
 constexpr double hx = 0.0001;
+
+
+
+// double hy = 0.0001;
 constexpr double density = 725.0, dynamic_viscosity = 0.53e-3;
 constexpr double nu = dynamic_viscosity / density;
 constexpr double v0_x = 2;
@@ -16,6 +20,7 @@ constexpr double fou = 10;
 
 int main() {
     int Nx = ceil(Lx / hx);
+    // int Ny = ceil(Ly / hy);
     // double hy = 0.0001;
     // int Ny = ceil(Ly / hy);
     vector<vector<double> > u(Nx, vector<double>(Ny, 0));
@@ -46,7 +51,7 @@ int main() {
             // double hy2 = 0.0001;
             // cout << fixed << setprecision(20) <<  y_j_left << " " << y_j << " "  << y_j_right <<  endl;
             // cout << fixed << setprecision(20) <<  hy1 << " " << hy2 << endl;
-            //             double hy1 = 0.1, hy2 = 0.1;
+                        // double hy1 = 0.1, hy2 = 0.1;
             u[i][j] = u[i - 1][j]
                       + hx / u[i - 1][j] *
                       (2 * nu / (hy2 * (hy1 + hy2)) * u[i - 1][j + 1]
@@ -57,6 +62,13 @@ int main() {
                        - hy2 * hy2 / (hy1 * hy2 * (hy1 + hy2)) * u[i - 1][j - 1]
                        + u[i - 1][j] * (hy2 * hy2 - hy1 * hy1) / (hy1 * hy2 * (hy1 + hy2)));
             v[i][j] = v[i][j - 1] - hy1 / hx * (u[i][j - 1] - u[i - 1][j - 1]);
+
+            // u[i][j] = u[i - 1][j] + (nu * hx / u[i - 1][j] * hy * hy) * (
+            //               u[i - 1][j + 1] - 2 * u[i - 1][j] + u[i - 1][j - 1]) - hx * (
+            //               v[i - 1][j] * (u[i - 1][j] - u[i - 1][j - 1])) / (
+            //               u[i - 1][j] * hy);
+            // v[i][j] = v[i][j - 1] - hy * (u[i][j - 1] - u[i - 1][j - 1]) / hx;
+
 
             const double epsilon = 1e-6;
             if (std::abs(u[i][j] - v0_x) < epsilon && !found) {

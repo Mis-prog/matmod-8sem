@@ -11,7 +11,7 @@ def draw_surface(x, y, Z):
     X, Y = np.meshgrid(data_pml['x'][:1001], data_pml['y'])
     fig = plt.figure(figsize=(12, 8))  # Размер окна
     ax = fig.add_subplot(111, projection='3d')
-    surf = ax.plot_surface(X, Y, Z, cmap='viridis')
+    surf = ax.plot_surface(X, Y, Z, cmap='plasma')
     ax.set_xlabel('x')
     ax.set_ylabel('y')
     plt.show()
@@ -26,7 +26,7 @@ def draw_surfaces(x1, y1, Z1, x2, y2, Z2, x3, y3, Z3):
 
     # Первый график
     ax1 = fig.add_subplot(1, 3, 1, projection='3d')
-    surf1 = ax1.plot_surface(X1, Y1, Z1, cmap='viridis')
+    surf1 = ax1.plot_surface(X1, Y1, Z1, cmap='plasma')
     ax1.set_title('PML')
     ax1.set_xlabel('x')
     ax1.set_ylabel('y')
@@ -35,7 +35,7 @@ def draw_surfaces(x1, y1, Z1, x2, y2, Z2, x3, y3, Z3):
 
     # Второй график
     ax2 = fig.add_subplot(1, 3, 2, projection='3d')
-    surf2 = ax2.plot_surface(X2, Y2, Z2, cmap='viridis')
+    surf2 = ax2.plot_surface(X2, Y2, Z2, cmap='plasma')
     ax2.set_title('Not PML')
     ax2.set_xlabel('x')
     ax2.set_ylabel('y')
@@ -44,7 +44,7 @@ def draw_surfaces(x1, y1, Z1, x2, y2, Z2, x3, y3, Z3):
 
     # Третий график (разность)
     ax3 = fig.add_subplot(1, 3, 3, projection='3d')
-    surf3 = ax3.plot_surface(X3, Y3, Z3, cmap='viridis')
+    surf3 = ax3.plot_surface(X3, Y3, Z3, cmap='plasma')
     ax3.set_title('Diff: Not PML - PML')
     ax3.set_xlabel('x')
     ax3.set_ylabel('y')
@@ -54,19 +54,19 @@ def draw_surfaces(x1, y1, Z1, x2, y2, Z2, x3, y3, Z3):
     plt.tight_layout()
     plt.show()
 
-
+#33
 iter = 0
 data_pml = {
-    'z': np.loadtxt(f'../result_alia/z_{iter}.txt'),
-    'x': np.loadtxt(f'../result_alia/x_{iter}.txt'),
-    'y': np.loadtxt(f'../result_alia/y_{iter}.txt')
+    'z': np.loadtxt(f'../result_my/z_{iter}.txt'),
+    'x': np.loadtxt(f'../result_my/x_{iter}.txt'),
+    'y': np.loadtxt(f'../result_my/y_{iter}.txt')
 }
-
+#32
 iter = 1
 data_not_pml = {
-    'z': np.loadtxt(f'../result_alia/z_{iter}.txt'),
-    'x': np.loadtxt(f'../result_alia/x_{iter}.txt'),
-    'y': np.loadtxt(f'../result_alia/y_{iter}.txt')
+    'z': np.loadtxt(f'../result_my/z_{iter}.txt'),
+    'x': np.loadtxt(f'../result_my/x_{iter}.txt'),
+    'y': np.loadtxt(f'../result_my/y_{iter}.txt')
 }
 
 sum_pml = 0
@@ -86,35 +86,35 @@ norm_not_pml = np.sqrt(sum_not_pml)
 print(f'norm_pml: {norm_pml}')
 print(f'norm_not_pml: {norm_not_pml}')
 
-draw_surfaces(data_pml['x'][:1001], data_pml['y'], data_pml['z'][:, :1001] / norm_pml,
-              data_not_pml['x'], data_not_pml['y'], data_not_pml['z'] / norm_not_pml,
-              data_not_pml['x'], data_not_pml['y'],
-              data_not_pml['z'] / norm_not_pml - data_pml['z'][:,:1001]/norm_pml)
+# draw_surfaces(data_pml['x'][:1001], data_pml['y'], data_pml['z'][:, :1001] / norm_pml,
+#               data_not_pml['x'], data_not_pml['y'], data_not_pml['z'] / norm_not_pml,
+#               data_not_pml['x'], data_not_pml['y'],
+#               data_not_pml['z'] / norm_not_pml - data_pml['z'][:,:1001]/norm_pml)
 
 # draw_surface(data_pml['x'][:1001], data_pml['y'], data_pml['z'][:, :1001] / norm_pml)
 # draw_surface(data_not_pml['x'][:1001], data_not_pml['y'], data_not_pml['z'][:, :1001] / norm_not_pml)
 # draw_surface(data_not_pml['x'][:1001], data_not_pml['y'],
 #              - data_pml['z'][:, :1001] / norm_pml + data_not_pml['z'][:, :1001] / norm_not_pml)
 
-# fig, axs = plt.subplots(3, 1, figsize=(10, 8), sharex=True)
-# for i in range(len(data_not_pml['y'])):
-#     axs[0].set_title('NOT PML - PML')
-#     axs[0].set_ylim([-0.01,0.01])
-#     axs[0].plot(data_not_pml['x'][:1001],
-#                  - data_pml['z'][i, :1001] / norm_pml + data_not_pml['z'][i, :1001] / norm_not_pml, color='green')
-#
-# for i in range(len(data_not_pml['y'])):
-#     axs[2].set_title('PML')
-#     axs[2].set_ylim([-0.01,0.01])
-#     axs[2].plot(data_not_pml['x'][:1001],
-#                 data_pml['z'][i, :1001]/norm_pml, color='green')
-#
-# for i in range(len(data_not_pml['y'])):
-#     axs[1].set_title('NOT PML')
-#     axs[1].set_ylim([-0.01,0.01])
-#     axs[1].plot(data_not_pml['x'][:1001],
-#                 data_not_pml['z'][i, :1001]/norm_not_pml, color='green')
-# plt.show()
+fig, axs = plt.subplots(3, 1, figsize=(10, 8), sharex=True)
+for i in range(len(data_not_pml['y'])):
+    axs[0].set_title('NOT PML - PML')
+    # axs[0].set_ylim([-0.005,0.01])
+    axs[0].plot(data_not_pml['x'][:1001],
+                 - data_pml['z'][i, :1001] / norm_pml + data_not_pml['z'][i, :1001] / norm_not_pml, color='blue')
+
+for i in range(len(data_not_pml['y'])):
+    axs[2].set_title('PML')
+    axs[2].set_ylim([-0.005,0.02])
+    axs[2].plot(data_not_pml['x'][:1001],
+                data_pml['z'][i, :1001]/norm_pml, color='blue')
+
+for i in range(len(data_not_pml['y'])):
+    axs[1].set_title('NOT PML')
+    axs[1].set_ylim([-0.005,0.02])
+    axs[1].plot(data_not_pml['x'][:1001],
+                data_not_pml['z'][i, :1001]/norm_not_pml, color='blue')
+plt.show()
 
 # diff = data_not_pml['z'][:, :1001] / norm_not_pml - data_pml['z'][:, :1001] / norm_pml
 # mse = np.mean(diff**2)

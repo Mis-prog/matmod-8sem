@@ -15,6 +15,11 @@ dr = 3
 A = 0.3
 T = 3
 
+ALLIVE, TAKT = [], []
+
+import matplotlib.pyplot as plt
+
+
 class CellularAutomaton:
     def __init__(self, width, height, N=256):
         pygame.init()
@@ -45,6 +50,9 @@ class CellularAutomaton:
         # Инициализация случайных живых клеток
         for i in range(int(A * N * N)):
             self.cells_state[random.randint(0, int((self.N - 1) * 0.7))][random.randint(0, self.N - 1)] = 1
+
+        # for j in range(self.N):
+        #     self.cells_state[int((self.N - 1) * 0.7)][j] = 1
 
     def action(self):
         # Ресурсы и энергия
@@ -127,6 +135,8 @@ class CellularAutomaton:
 
         # Отображение информации
         alive, dead = self.countAliveCells()
+        ALLIVE.append(alive)
+        TAKT.append(self.count)
         text = f"Такт: {self.count} | Живые: {alive} | Мёртвые: {dead}"
         text_surface = self.font.render(text, True, self.BLACK)
         self.screen.blit(text_surface, (20, 20))
@@ -142,17 +152,19 @@ class CellularAutomaton:
                 if event.type == pygame.QUIT:
                     running = False
                 elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_SPACE:
-                        paused = not paused
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    x, y = pygame.mouse.get_pos()
-                    grid_x = x // self.cell_size
-                    grid_y = y // self.cell_size
-                    if 0 <= grid_x < self.N and 0 <= grid_y < self.N:
-                        # Переключаем состояние клетки по клику мыши
-                        self.cells_state[grid_y][grid_x] = 1 - self.cells_state[grid_y][grid_x]
-                        if self.cells_state[grid_y][grid_x] == 1:
-                            self.e[grid_y][grid_x] = p1 // 2  # Начальная энергия для клетки
+                    if event.key == pygame.K_ESCAPE:
+                        plt.plot(TAKT,ALLIVE)
+                        plt.savefig("active_cells_plot_task3.png")
+                        running = False
+                # elif event.type == pygame.MOUSEBUTTONDOWN:
+                #     x, y = pygame.mouse.get_pos()
+                #     grid_x = x // self.cell_size
+                #     grid_y = y // self.cell_size
+                #     if 0 <= grid_x < self.N and 0 <= grid_y < self.N:
+                #         # Переключаем состояние клетки по клику мыши
+                #         self.cells_state[grid_y][grid_x] = 1 - self.cells_state[grid_y][grid_x]
+                #         if self.cells_state[grid_y][grid_x] == 1:
+                #             self.e[grid_y][grid_x] = p1 // 2  # Начальная энергия для клетки
 
             if not paused:
                 self.action()
@@ -164,6 +176,7 @@ class CellularAutomaton:
 
         pygame.quit()
         sys.exit()
+
 
 if __name__ == "__main__":
     # Размер N уменьшен для более наглядной визуализации

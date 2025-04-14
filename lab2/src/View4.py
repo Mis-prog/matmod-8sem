@@ -56,7 +56,7 @@ class View4(QWidget):
         # self.cells_state[17][15] = 1
         # self.cells_state[17][16] = 1
         for i in range(int(A * N * N)):
-            self.cells_state[random.randint(0, int((self.N - 1)*0.7))][random.randint(0, int((self.N - 1) * 1))] = 1
+            self.cells_state[random.randint(0, int((self.N - 1)*0.5))][random.randint(0, int((self.N - 1) * 1))] = 1
 
     def InitWindow(self):
         self.setWindowTitle(self.title)

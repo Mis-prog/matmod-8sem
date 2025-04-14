@@ -20,6 +20,8 @@ dr = 3
 A = 0.3
 T = 3
 
+ACTIVE, COUNT = [], []
+
 
 class CellularAutomaton:
     def __init__(self, width, height, N=100):
@@ -42,7 +44,7 @@ class CellularAutomaton:
 
         # Инициализация случайных живых клеток
         for i in range(int(A * N * N)):
-            self.cells_state[random.randint(0, int((self.N - 1) * 0.7))][random.randint(0, int((self.N - 1) * 1))] = 1
+            self.cells_state[random.randint(0, int((self.N - 1) * 0.5))][random.randint(0, int((self.N - 1) * 1))] = 1
 
         # Цвета
         self.WHITE = (255, 255, 255)
@@ -173,9 +175,10 @@ class CellularAutomaton:
     def draw(self):
         self.screen.fill(self.WHITE)
 
+        max_j = self.width // self.cell_size
         # Отрисовка клеток
-        for i in range(self.N):
-            for j in range(self.N):
+        for i in range(int(self.N * 0.8)):
+            for j in range(int(self.N * 0.8)):
                 color = self.GREEN if self.cells_state[i][j] == 1 else self.WHITE
                 pygame.draw.rect(self.screen, color, (j * self.cell_size, i * self.cell_size,
                                                       self.cell_size, self.cell_size))
@@ -183,11 +186,13 @@ class CellularAutomaton:
                 #                                            self.cell_size, self.cell_size), 1)
 
         # Отображение графика справа
-        graph_surf = self.update_graph()
-        self.screen.blit(graph_surf, (self.width, 50))
+        # graph_surf = self.update_graph()
+        # self.screen.blit(graph_surf, (self.width, 50))
 
         # Отображение информации
         alive, dead = self.countAliveCells()
+        ACTIVE.append(alive)
+        COUNT.append(self.count)
         text = f"Такт: {self.count} | Живые: {alive} | Мёртвые: {dead}"
         text_surface = self.font.render(text, True, (0, 0, 0))
         self.screen.blit(text_surface, (20, 20))
@@ -216,18 +221,21 @@ class CellularAutomaton:
                 if event.type == pygame.QUIT:
                     running = False
                 elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_SPACE:
-                        paused = not paused
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    x, y = pygame.mouse.get_pos()
-                    if x < self.width:  # Только в пределах сетки
-                        grid_x = x // self.cell_size
-                        grid_y = y // self.cell_size
-                        if 0 <= grid_x < self.N and 0 <= grid_y < self.N:
-                            # Переключаем состояние клетки по клику мыши
-                            self.cells_state[grid_y][grid_x] = 1 - self.cells_state[grid_y][grid_x]
-                            if self.cells_state[grid_y][grid_x] == 1:
-                                self.e[grid_y][grid_x] = p1 // 2  # Начальная энергия для созданной клетки
+                    if event.key == pygame.K_ESCAPE:
+                        plt.plot(COUNT,ACTIVE)
+                        plt.savefig("active_cells_plot.png")
+                        running = False
+
+                    # elif event.type == pygame.MOUSEBUTTONDOWN:
+                    # x, y = pygame.mouse.get_pos()
+                    # if x < self.width:  # Только в пределах сетки
+                    #     grid_x = x // self.cell_size
+                    #     grid_y = y // self.cell_size
+                    #     if 0 <= grid_x < self.N and 0 <= grid_y < self.N:
+                    #         # Переключаем состояние клетки по клику мыши
+                    #         self.cells_state[grid_y][grid_x] = 1 - self.cells_state[grid_y][grid_x]
+                    #         if self.cells_state[grid_y][grid_x] == 1:
+                    #             self.e[grid_y][grid_x] = p1 // 2  # Начальная энергия для созданной клетки
 
             if not paused:
                 self.action()
@@ -235,7 +243,7 @@ class CellularAutomaton:
                 print(f"Такт: {self.count}")
 
             self.draw()
-            self.clock.tick(10)  # 10 FPS
+            self.clock.tick(5)  # 10 FPS
 
         pygame.quit()
         plt.close(self.fig)  # Закрываем фигуру matplotlib
@@ -247,3 +255,10 @@ if __name__ == "__main__":
     # и графиком справа шириной 400 пикселей
     automaton = CellularAutomaton(900, 900, N=256)
     automaton.run()
+
+
+
+    plt.plot(COUNT,ACTIVE)
+    plt.show()
+
+
