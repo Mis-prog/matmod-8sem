@@ -51,12 +51,12 @@ class CellularAutomaton:
 
         # Цвета
         self.WHITE = (255, 255, 255)
-        self.GREEN = (34, 177, 76)
+        self.GREEN = (139, 0, 255)
         self.BLACK = (240, 240, 240)
-        self.GRAY = (240, 240, 240)
+        self.GRAY = (169, 169, 169)
 
         # Шрифт для отображения информации
-        self.font = pygame.font.SysFont('Arial', 16, True)
+        self.font = pygame.font.SysFont('Arial', 20, True)
 
         # Данные для графика
         self.count_history = []
@@ -198,6 +198,8 @@ class CellularAutomaton:
         # Отображение графика справа
         # graph_surf = self.update_graph()
         # self.screen.blit(graph_surf, (self.width, 50))
+        # self.draw_grid()
+
 
         # Отображение информации
         alive, dead = self.countAliveCells()
@@ -205,7 +207,7 @@ class CellularAutomaton:
         COUNT.append(self.count)
         text = f"Такт: {self.count} | Живые: {alive} | Мёртвые: {dead}"
         text_surface = self.font.render(text, True, (0, 0, 0))
-        self.screen.blit(text_surface, (20, 20))
+        self.screen.blit(text_surface, (0, 100))
 
         # Добавляем инструкции
         instructions = [
@@ -258,12 +260,19 @@ class CellularAutomaton:
         pygame.quit()
         plt.close(self.fig)  # Закрываем фигуру matplotlib
         sys.exit()
+    def draw_grid(self):
+        """Функция для отрисовки сетки."""
+        for i in range(1, self.N):
+            # Вертикальные линии
+            pygame.draw.line(self.screen, self.GRAY, (i * self.cell_size, 0), (i * self.cell_size, self.height), 1)
+            # Горизонтальные линии
+            pygame.draw.line(self.screen, self.GRAY, (0, i * self.cell_size), (self.width, i * self.cell_size), 1)
 
 
 if __name__ == "__main__":
     # Создаем экземпляр автомата с размерами основной сетки 800x800
     # и графиком справа шириной 400 пикселей
-    automaton = CellularAutomaton(900, 900, N=256)
+    automaton = CellularAutomaton(1000, 1000, N=256)
     automaton.run()
 
     plt.plot(COUNT, ACTIVE)
