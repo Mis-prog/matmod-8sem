@@ -209,9 +209,11 @@ int LIB::calc(int iter) {
     Eigen::MatrixXd sol = solver.solve(f);
 
     ofstream data("../lab3/result_alia/data_" + to_string(iter) + ".txt");
-    data << "Nx = " << Nx << " ,Ny = " << Ny << " ,Nl = " << Nl <<
-            ", y0 =" << ynull << " ,k = " << k << " ,eps = " << eps
-            << " ,L = " << L << " ,Lpml = " << Lpml << std::endl;
+//    data << "Nx = " << Nx << " ,Ny = " << Ny << " ,Nl = " << Nl <<
+//            ", y0 =" << ynull << " ,k = " << k << " ,eps = " << eps
+//            << " ,L = " << L << " ,Lpml = " << Lpml << std::endl;
+    data << ynull << " " << eps << " " << k << endl;
+
     data.close();
 
     ofstream z("../lab3/result_alia/z_" + to_string(iter) + ".txt");
