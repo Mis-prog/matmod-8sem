@@ -43,8 +43,12 @@ class CellularAutomaton:
         self.count = 0
 
         # Инициализация случайных живых клеток
-        for i in range(int(A * N * N)):
-            self.cells_state[random.randint(0, int((self.N - 1) * 0.5))][random.randint(0, int((self.N - 1) * 1))] = 1
+        # for i in range(int(A * N * N)):
+        #     self.cells_state[random.randint(0, int((self.N - 1) * 0.5))][random.randint(0, int((self.N - 1) * 1))] = 1
+        # for i in range(int(N)):
+        #     self.cells_state[i][int((self.N - 1)*0.5)] = 1
+        self.cells_state[int((self.N - 1)*0.5)][int((self.N - 1)*0.5)] = 1
+
 
         # Цвета
         self.WHITE = (255, 255, 255)
@@ -177,8 +181,8 @@ class CellularAutomaton:
 
         max_j = self.width // self.cell_size
         # Отрисовка клеток
-        for i in range(int(self.N * 0.8)):
-            for j in range(int(self.N * 0.8)):
+        for i in range(int(self.N)):
+            for j in range(int(self.N)):
                 color = self.GREEN if self.cells_state[i][j] == 1 else self.WHITE
                 pygame.draw.rect(self.screen, color, (j * self.cell_size, i * self.cell_size,
                                                       self.cell_size, self.cell_size))
@@ -222,7 +226,7 @@ class CellularAutomaton:
                     running = False
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        plt.plot(COUNT,ACTIVE)
+                        plt.plot(COUNT, ACTIVE)
                         plt.savefig("active_cells_plot.png")
                         running = False
 
@@ -256,9 +260,5 @@ if __name__ == "__main__":
     automaton = CellularAutomaton(900, 900, N=256)
     automaton.run()
 
-
-
-    plt.plot(COUNT,ACTIVE)
+    plt.plot(COUNT, ACTIVE)
     plt.show()
-
-

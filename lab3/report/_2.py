@@ -1,98 +1,61 @@
-# import numpy as np
-# import matplotlib.pyplot as plt
-# from mpl_toolkits.mplot3d import Axes3D
-# import os
-# import matplotlib
-#
-# matplotlib.use('TkAgg')
-#
-# print("Текущая рабочая директория:", os.getcwd())
-#
-# iter =100
-# Z = np.loadtxt(f'../result_my/z_{iter}.txt')
-# x = np.loadtxt(f'../result_my/x_{iter}.txt')
-# y = np.loadtxt(f'../result_my/y_{iter}.txt')
-# X, Y = np.meshgrid(x, y)
-#
-# # iter =34
-# # _Z = np.loadtxt(f'../result_my/z_{iter}.txt')
-# # _x = np.loadtxt(f'../result_my/x_{iter}.txt')
-# # _y = np.loadtxt(f'../result_my/y_{iter}.txt')
-# # _X, _Y = np.meshgrid(_x, _y)
-#
-# fig = plt.figure(figsize=(16, 6))
-#
-# # Первый график — 3D поверхность
-# ax = fig.add_subplot(1, 1, 1, projection='3d')
-# surf = ax.plot_surface(X, Y, Z, cmap='plasma', alpha=0.8)
-# # fig.colorbar(surf, ax=ax1, shrink=0.5, aspect=10, label='z')
-# ax.set_xlabel('x')
-# ax.set_ylabel('y')
-# ax.set_zlabel('z')
-# ax.set_title('3D поверхность')
-# plt.plot()
-#
-# # # Второй график — проекция на плоскость ZX
-# # ax2 = fig.add_subplot(1, 2, 2, projection='3d')
-# # # for i in range(len(y)):
-# # #     ax2.plot(x, Z[i, :], color='blue', alpha=0.8)
-# # #
-# # # ax2.set_xlabel('x')
-# # # ax2.set_ylabel('z')
-# # # ax2.set_title('Проекция на ZX')
-# # # ax2.grid(True)
-# #
-# # ax2.plot_surface(_X, _Y, _Z, cmap='plasma', alpha=0.8)
-# # # fig.colorbar(surf, ax=ax1, shrink=0.5, aspect=10, label='z')
-# # ax2.set_xlabel('x')
-# # ax2.set_ylabel('y')
-# # ax2.set_zlabel('z')
-# # ax2.set_title('3D поверхность')
-# #
-# # plt.tight_layout()
-# # plt.show()
-#
-#
-# # for i in range(len(y)):
-# #     plt.plot(_x, _Z[i, :], color='blue')
-# # # plt.plot(y, data[:, 100], color='blue')
-# # plt.xlabel('x')
-# # plt.ylabel('z')
-# # plt.grid(True)
-# # plt.title('Проекция на ZX')
-# # plt.show()
-
-
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from matplotlib.widgets import Button
 import os
 import matplotlib
 
 matplotlib.use('TkAgg')
 
 print("Текущая рабочая директория:", os.getcwd())
-#eps0 1 20 ynull = 0.5 100 101 102
-#eps1  ynull 0.7  200 201
-#eps 20 300
-iter = 202
-Z = np.loadtxt(f'../result_my/z_{iter}.txt')
-x = np.loadtxt(f'../result_my/x_{iter}.txt')
-y = np.loadtxt(f'../result_my/y_{iter}.txt')
-X, Y = np.meshgrid(x, y)
+
+# Загружаем данные
+iter1 = 100
+iter2 = 102
+
+data1 = np.loadtxt(f'../result_alia/data_{iter1}.txt')
+Z1 = np.loadtxt(f'../result_alia/z_{iter1}.txt')
+x1 = np.loadtxt(f'../result_alia/x_{iter1}.txt')
+y1 = np.loadtxt(f'../result_alia/y_{iter1}.txt')
+X1, Y1 = np.meshgrid(x1, y1)
+
+data2 = np.loadtxt(f'../result_alia/data_{iter2}.txt')
+Z2 = np.loadtxt(f'../result_alia/z_{iter2}.txt')
+x2 = np.loadtxt(f'../result_alia/x_{iter2}.txt')
+y2 = np.loadtxt(f'../result_alia/y_{iter2}.txt')
+X2, Y2 = np.meshgrid(x2, y2)
+
+# Фигура и оси
+fig = plt.figure(figsize=(16, 6))
+ax1 = fig.add_subplot(1, 2, 1, projection='3d')
+ax2 = fig.add_subplot(1, 2, 2, projection='3d')
+
+# Первая поверхность
+surf1 = ax1.plot_surface(X1, Y1, Z1, cmap='plasma', alpha=0.9)
+ax1.set_title(f'ynull = {data1[0]}, eps = {data1[1]}, k = {data1[2]}')
+ax1.set_xlabel('x')
+ax1.set_ylabel('y')
+ax1.set_zlabel('z')
+fig.colorbar(surf1, ax=ax1, shrink=0.5, aspect=10)
+
+# Вторая поверхность
+surf2 = ax2.plot_surface(X2, Y2, Z2, cmap='plasma', alpha=0.9)
+ax2.set_title(f'ynull = {data2[0]}, eps = {data2[1]}, k = {data2[2]}')
+ax2.set_xlabel('x')
+ax2.set_ylabel('y')
+ax2.set_zlabel('z')
+colorbar2 = fig.colorbar(surf2, ax=ax2, shrink=0.5, aspect=10)
+
+plt.tight_layout(rect=[0, 0.07, 1, 1])
+plt.show()
 
 fig = plt.figure(figsize=(16, 6))
+ax1 = fig.add_subplot(1, 2, 1)
+ax2 = fig.add_subplot(1, 2, 2)
 
-# Первый график — 3D поверхность
-ax = fig.add_subplot(1, 1, 1, projection='3d')
-surf = ax.plot_surface(X, Y, Z, cmap='plasma', alpha=0.8)
-ax.set_xlabel('x')
-ax.set_ylabel('y')
-ax.set_zlabel('z')
-ax.set_title('3D поверхность')
+ax1.plot(x1, Z1.T, color='red')
+ax1.set_title(f'ynull = {data1[0]}, eps = {data1[1]}, k = {data1[2]}')
 
-# Включение цветовой шкалы
-fig.colorbar(surf, ax=ax, shrink=0.5, aspect=10, label='z')
-
-# Отображение графика
+ax2.plot(x2, Z2.T, color='red')
+ax2.set_title(f'ynull = {data2[0]}, eps = {data2[1]}, k = {data2[2]}')
 plt.show()

@@ -15,10 +15,10 @@ namespace rustem {
     int Ny = 500;
     double L = 10;
     double Lpml = 5;
-    double k = 10;
+    double k = 5;
     double eps = 0.0;
     double ynull = 0.5;
-    int iter = 34;
+    int iter = 0;
 
     void run() {
         LIB lib(Nx, Ny, L, Lpml, ynull, k, eps);
@@ -64,7 +64,6 @@ namespace rustem {
         iter = 100;
         std::vector<double> eps_vals{0, 5, 15, 30};
         for (int i = 0; i < eps_vals.size(); i++) {
-            Lpml = 5;
             k = 5;
             eps = eps_vals[i];
             auto start = std::chrono::high_resolution_clock::now();
@@ -78,9 +77,7 @@ namespace rustem {
 
         iter = 200;
         std::vector<double> _y{0.5, 0.7, 0.9};
-        for (int i = 0; i < eps_vals.size(); i++) {
-            Lpml = 5;
-            k = 5;
+        for (int i = 0; i < _y.size(); i++) {
             ynull = _y[i];
             eps = 5;
             auto start = std::chrono::high_resolution_clock::now();
@@ -88,14 +85,12 @@ namespace rustem {
             lib.calc(iter);
             auto stop = std::chrono::high_resolution_clock::now();
             auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start);
-            std::cout << "eps = " << eps << " :: " << duration.count() << " seconds\n";
+            std::cout << "ynull = " << ynull << " :: " << duration.count() << " seconds\n";
             iter++;
         }
 
         iter = 300;
-        for (int i = 0; i < eps_vals.size(); i++) {
-            Lpml = 5;
-            k = 5;
+        for (int i = 0; i < _y.size(); i++) {
             ynull = _y[i];
             eps = 15;
             auto start = std::chrono::high_resolution_clock::now();
@@ -103,14 +98,12 @@ namespace rustem {
             lib.calc(iter);
             auto stop = std::chrono::high_resolution_clock::now();
             auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start);
-            std::cout << "eps = " << eps << " :: " << duration.count() << " seconds\n";
+            std::cout << "ynull = " << ynull << " :: " << duration.count() << " seconds\n";
             iter++;
         }
 
         iter = 400;
-        for (int i = 0; i < eps_vals.size(); i++) {
-            Lpml = 5;
-            k = 5;
+        for (int i = 0; i < _y.size(); i++) {
             ynull = _y[i];
             eps = 30;
             auto start = std::chrono::high_resolution_clock::now();
@@ -118,11 +111,9 @@ namespace rustem {
             lib.calc(iter);
             auto stop = std::chrono::high_resolution_clock::now();
             auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start);
-            std::cout << "eps = " << eps << " :: " << duration.count() << " seconds\n";
+            std::cout << "ynull = " << ynull << " :: " << duration.count() << " seconds\n";
             iter++;
         }
-
-
         // std::vector<double> y0_vals{0.5, 0.7, 0.9};
         // for (int i = 0; i < y0_vals.size(); i++) {
         //     Lpml = 5;
