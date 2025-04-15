@@ -28,13 +28,14 @@ class CellularAutomaton:
         pygame.init()
         self.width = width
         self.height = height
-        self.screen = pygame.display.set_mode((width + 600, height))  # Добавляем 400 пикселей для графика
+
+        self.screen = pygame.display.set_mode((width, height))  # Добавляем 400 пикселей для графика
         pygame.display.set_caption("Pygame Cellular Automaton with Graph")
         self.clock = pygame.time.Clock()
 
         self.N = N
         self.cell_size = min(width, height) // N
-
+        # self.cell_size = 3.3
         # Инициализация состояний клеток
         self.cells_state = [[0] * self.N for i in range(self.N)]
         self.p = [[pmax] * self.N for i in range(self.N)]
@@ -43,17 +44,15 @@ class CellularAutomaton:
         self.count = 0
 
         # Инициализация случайных живых клеток
-        # for i in range(int(A * N * N)):
-        #     self.cells_state[random.randint(0, int((self.N - 1) * 0.5))][random.randint(0, int((self.N - 1) * 1))] = 1
+        for i in range(int(A * N * N)):
+            self.cells_state[random.randint(0, int((self.N - 1) * 0.7))][random.randint(0, int((self.N - 1) * 1))] = 1
         # for i in range(int(N)):
         #     self.cells_state[i][int((self.N - 1)*0.5)] = 1
-        self.cells_state[int((self.N - 1)*0.5)][int((self.N - 1)*0.5)] = 1
-
 
         # Цвета
         self.WHITE = (255, 255, 255)
-        self.GREEN = (0, 255, 0)
-        self.BLACK = (200, 200, 200)
+        self.GREEN = (34, 177, 76)
+        self.BLACK = (240, 240, 240)
         self.GRAY = (240, 240, 240)
 
         # Шрифт для отображения информации
@@ -93,17 +92,24 @@ class CellularAutomaton:
         for i in range(self.N):
             for j in range(self.N):
                 if self.cells_state[i][j] == 1 and move[i][j] == 1:
+                    neighbors = [(di, dj) for di in range(-1, 2) for dj in range(-1, 2) if not (di == 0 and dj == 0)]
+                    random.shuffle(neighbors)
                     bk = i
                     bl = j
                     bp = self.p[i][j]
-                    for k in range(i - 1, i + 2):
-                        for l in range(j - 1, j + 2):
-                            if k >= 0 and k < self.N and l >= 0 and l < self.N:
-                                if self.cells_state[k][l] == 0:
-                                    if self.p[k][l] > bp:
-                                        bk = k
-                                        bl = l
-                                        bp = self.p[k][l]
+
+                    for di, dj in neighbors:
+                        k = i + di
+                        l = j + dj
+                        if 0 <= k < self.N and 0 <= l < self.N:
+                            if self.cells_state[k][l] == 0:
+                                if self.p[k][l] > bp:
+                                    bk = k
+                                    bl = l
+                                    bp = self.p[k][l]
+
+
+                # Обновление состояния клеток
                     move[bk][bl] = 0
                     if bk != i or bl != j:
                         self.cells_state[i][j] = 0
