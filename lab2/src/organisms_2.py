@@ -28,13 +28,14 @@ class CellularAutomaton:
         pygame.init()
         self.width = width
         self.height = height
-        self.screen = pygame.display.set_mode((width + 600, height))  # Добавляем 400 пикселей для графика
+
+        self.screen = pygame.display.set_mode((width, height))  # Добавляем 400 пикселей для графика
         pygame.display.set_caption("Pygame Cellular Automaton with Graph")
         self.clock = pygame.time.Clock()
 
         self.N = N
         self.cell_size = min(width, height) // N
-
+        # self.cell_size = 3.3
         # Инициализация состояний клеток
         self.cells_state = [[0] * self.N for i in range(self.N)]
         self.p = [[pmax] * self.N for i in range(self.N)]
@@ -44,16 +45,18 @@ class CellularAutomaton:
 
         # Инициализация случайных живых клеток
         for i in range(int(A * N * N)):
-            self.cells_state[random.randint(0, int((self.N - 1) * 0.5))][random.randint(0, int((self.N - 1) * 1))] = 1
+            self.cells_state[random.randint(0, int((self.N - 1) * 0.7))][random.randint(0, int((self.N - 1) * 1))] = 1
+        # for i in range(int(N)):
+        #     self.cells_state[i][int((self.N - 1)*0.5)] = 1
 
         # Цвета
         self.WHITE = (255, 255, 255)
-        self.GREEN = (0, 255, 0)
-        self.BLACK = (200, 200, 200)
-        self.GRAY = (240, 240, 240)
+        self.GREEN = (139, 0, 255)
+        self.BLACK = (240, 240, 240)
+        self.GRAY = (169, 169, 169)
 
         # Шрифт для отображения информации
-        self.font = pygame.font.SysFont('Arial', 16, True)
+        self.font = pygame.font.SysFont('Arial', 20, True)
 
         # Данные для графика
         self.count_history = []
@@ -89,17 +92,24 @@ class CellularAutomaton:
         for i in range(self.N):
             for j in range(self.N):
                 if self.cells_state[i][j] == 1 and move[i][j] == 1:
+                    neighbors = [(di, dj) for di in range(-1, 2) for dj in range(-1, 2) if not (di == 0 and dj == 0)]
+                    random.shuffle(neighbors)
                     bk = i
                     bl = j
                     bp = self.p[i][j]
-                    for k in range(i - 1, i + 2):
-                        for l in range(j - 1, j + 2):
-                            if k >= 0 and k < self.N and l >= 0 and l < self.N:
-                                if self.cells_state[k][l] == 0:
-                                    if self.p[k][l] > bp:
-                                        bk = k
-                                        bl = l
-                                        bp = self.p[k][l]
+
+                    for di, dj in neighbors:
+                        k = i + di
+                        l = j + dj
+                        if 0 <= k < self.N and 0 <= l < self.N:
+                            if self.cells_state[k][l] == 0:
+                                if self.p[k][l] > bp:
+                                    bk = k
+                                    bl = l
+                                    bp = self.p[k][l]
+
+
+                # Обновление состояния клеток
                     move[bk][bl] = 0
                     if bk != i or bl != j:
                         self.cells_state[i][j] = 0
@@ -177,8 +187,8 @@ class CellularAutomaton:
 
         max_j = self.width // self.cell_size
         # Отрисовка клеток
-        for i in range(int(self.N * 0.8)):
-            for j in range(int(self.N * 0.8)):
+        for i in range(int(self.N)):
+            for j in range(int(self.N)):
                 color = self.GREEN if self.cells_state[i][j] == 1 else self.WHITE
                 pygame.draw.rect(self.screen, color, (j * self.cell_size, i * self.cell_size,
                                                       self.cell_size, self.cell_size))
@@ -188,6 +198,8 @@ class CellularAutomaton:
         # Отображение графика справа
         # graph_surf = self.update_graph()
         # self.screen.blit(graph_surf, (self.width, 50))
+        # self.draw_grid()
+
 
         # Отображение информации
         alive, dead = self.countAliveCells()
@@ -195,7 +207,7 @@ class CellularAutomaton:
         COUNT.append(self.count)
         text = f"Такт: {self.count} | Живые: {alive} | Мёртвые: {dead}"
         text_surface = self.font.render(text, True, (0, 0, 0))
-        self.screen.blit(text_surface, (20, 20))
+        self.screen.blit(text_surface, (0, 100))
 
         # Добавляем инструкции
         instructions = [
@@ -222,7 +234,7 @@ class CellularAutomaton:
                     running = False
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        plt.plot(COUNT,ACTIVE)
+                        plt.plot(COUNT, ACTIVE)
                         plt.savefig("active_cells_plot.png")
                         running = False
 
@@ -248,17 +260,20 @@ class CellularAutomaton:
         pygame.quit()
         plt.close(self.fig)  # Закрываем фигуру matplotlib
         sys.exit()
+    def draw_grid(self):
+        """Функция для отрисовки сетки."""
+        for i in range(1, self.N):
+            # Вертикальные линии
+            pygame.draw.line(self.screen, self.GRAY, (i * self.cell_size, 0), (i * self.cell_size, self.height), 1)
+            # Горизонтальные линии
+            pygame.draw.line(self.screen, self.GRAY, (0, i * self.cell_size), (self.width, i * self.cell_size), 1)
 
 
 if __name__ == "__main__":
     # Создаем экземпляр автомата с размерами основной сетки 800x800
     # и графиком справа шириной 400 пикселей
-    automaton = CellularAutomaton(900, 900, N=256)
+    automaton = CellularAutomaton(1000, 1000, N=256)
     automaton.run()
 
-
-
-    plt.plot(COUNT,ACTIVE)
+    plt.plot(COUNT, ACTIVE)
     plt.show()
-
-
