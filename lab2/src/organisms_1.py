@@ -35,11 +35,11 @@ class CellularAutomaton:
 
         # Цвета
         self.WHITE = (255, 255, 255)
-        self.GREEN = (0, 255, 0)
+        self.GREEN = (139, 0, 255)
         self.BLACK = (0, 0, 0)
 
         # Шрифт для отображения информации
-        self.font = pygame.font.SysFont('Arial', 16, True)
+        self.font = pygame.font.SysFont('Arial', 20, True)
 
         # Инициализация состояний клеток
         self.cells_state = [[0] * self.N for i in range(self.N)]
@@ -139,7 +139,7 @@ class CellularAutomaton:
         TAKT.append(self.count)
         text = f"Такт: {self.count} | Живые: {alive} | Мёртвые: {dead}"
         text_surface = self.font.render(text, True, self.BLACK)
-        self.screen.blit(text_surface, (20, 20))
+        self.screen.blit(text_surface, (0, 100))
 
         pygame.display.flip()
 
@@ -181,5 +181,5 @@ class CellularAutomaton:
 if __name__ == "__main__":
     # Размер N уменьшен для более наглядной визуализации
     # Вы можете установить исходное значение N=256, если нужно
-    automaton = CellularAutomaton(900, 900, N=256)
+    automaton = CellularAutomaton(1000, 1000, N=256)
     automaton.run()
