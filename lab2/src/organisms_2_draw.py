@@ -6,6 +6,9 @@ ACTIVE = data['active']
 COUNT = data['count']
 
 plt.plot(COUNT,ACTIVE)
+plt.xlabel('Такт')
+plt.ylabel('Кол-во живых')
+plt.grid()
 plt.show()
 
 
