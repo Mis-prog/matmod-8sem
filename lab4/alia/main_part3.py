@@ -111,7 +111,7 @@ for j in range(U_field.shape[1]):  # Перебор всех столбцов
         first_x = X[first_row_index, j]
         first_y = Y[first_row_index, j]
         results.append([first_x, first_y, first_value])
-        print(f"Столбец {j}: Первое значение U ≈ 2 на позиции ({first_x}, {first_y}), U = {first_value}")
+        print(f"Столбец {j}: Первое значение U ≈ 3 на позиции ({first_x}, {first_y}), U = {first_value}")
 
 np.savetxt("result/first_values.csv", results, delimiter=",", header="x,y,U", comments="")
 

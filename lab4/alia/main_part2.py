@@ -7,27 +7,27 @@ v = np.loadtxt("result/results_v.txt")
 regional = np.loadtxt("result/regional.txt")
 
 
-# # # Определяем размеры сетки
-# Ny, Nx = u.shape
-# x = np.linspace(0, 2, Nx)
-# y = np.linspace(0, 1, Ny)
-# X, Y = np.meshgrid(x, y)
-#
-#
-#
-# # Отображение векторного поля
-# plt.figure(figsize=(10, 6))
-# stepX = 1
-# stepY = 400
-# plt.plot(regional[:,0],regional[:,1],color='r')
-# plt.quiver(X[::stepX,::stepY], Y[::stepX,::stepY], u[::stepX,::stepY], v[::stepX,::stepY], scale=100, color="black")
-# plt.xlabel("x")
-# plt.ylabel("y")
-# plt.ylim(0,0.025)
-# plt.title("Погран слой")
-# # plt.ylim(0, 0.025)
-# # plt.savefig("vector_field.png")
-# plt.show()
+# # Определяем размеры сетки
+Ny, Nx = u.shape
+x = np.linspace(0, 2, Nx)
+y = np.linspace(0, 1, Ny)
+X, Y = np.meshgrid(x, y)
+
+
+
+# Отображение векторного поля
+plt.figure(figsize=(10, 6))
+stepX = 1
+stepY = 400
+plt.plot(regional[:,0],regional[:,1],color='r')
+plt.quiver(X[::stepX,::stepY], Y[::stepX,::stepY], u[::stepX,::stepY], v[::stepX,::stepY], scale=100, color="black")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.ylim(0,0.025)
+plt.title("Погран слой")
+# plt.ylim(0, 0.025)
+# plt.savefig("vector_field.png")
+plt.show()
 
 # Апроксимация
 from scipy.optimize import curve_fit

@@ -64,12 +64,12 @@ namespace rustem {
         //     iter++;
         // }
 
-        iter = 400;
+        iter = 700;
         std::vector<double> eps_vals{0, 1, 5, 15, 30};
         for (int i = 0; i < eps_vals.size(); i++) {
             ynull = 0.5;
             Lpml = 5;
-            k = 8;
+            k = 5;
             eps = eps_vals[i];
             auto start = std::chrono::high_resolution_clock::now();
             LIB lib(Nx, Ny, L, Lpml, ynull, k, eps);
@@ -80,10 +80,10 @@ namespace rustem {
             iter++;
         }
 
-        iter = 500;
+        iter = 800;
         for (int i = 0; i < eps_vals.size(); i++) {
             Lpml = 5;
-            k = 8;
+            k = 5;
             ynull = 0.7;
             eps = eps_vals[i];
             auto start = std::chrono::high_resolution_clock::now();
@@ -95,10 +95,10 @@ namespace rustem {
             iter++;
         }
 
-        iter = 600;
+        iter = 900;
         for (int i = 0; i < eps_vals.size(); i++) {
             Lpml = 5;
-            k = 8;
+            k = 5;
             ynull = 0.9;
             eps = eps_vals[i];
             auto start = std::chrono::high_resolution_clock::now();

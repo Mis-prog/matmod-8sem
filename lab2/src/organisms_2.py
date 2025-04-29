@@ -235,6 +235,8 @@ class CellularAutomaton:
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         plt.plot(COUNT, ACTIVE)
+                        plt.xlabel('Такт')
+                        plt.ylabel('Кол-во живых')
                         plt.savefig("active_cells_plot.png")
                         running = False
 
