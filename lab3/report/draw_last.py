@@ -10,8 +10,8 @@ matplotlib.use('TkAgg')
 print("Текущая рабочая директория:", os.getcwd())
 
 # Загружаем данные
-iter1 = 100
-iter2 = 102
+iter1 = 600
+iter2 = 604
 
 data1 = np.loadtxt(f'../result_alia/data_{iter1}.txt')
 Z1 = np.loadtxt(f'../result_alia/z_{iter1}.txt')
