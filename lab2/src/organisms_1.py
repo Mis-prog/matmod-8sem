@@ -79,21 +79,23 @@ class CellularAutomaton:
         for i in range(self.N):
             for j in range(self.N):
                 if self.cells_state[i][j] == 1 and move[i][j] == 1:
-                    si = random.randint(-1, 1)
-                    sj = random.randint(-1, 1)
-                    if si == 0 and sj == 0:
-                        si = 1
-                    if i + si >= 0 and i + si < self.N and j + sj >= 0 and j + sj < self.N:
-                        if self.cells_state[i + si][j + sj] == 0:
-                            self.cells_state[i][j] = 0
-                            self.cells_state[i + si][j + sj] = 1
-                            move[i + si][j + sj] = 0
-                            self.e[i + si][j + sj] = self.e[i][j]
-                            self.life[i + si][j + sj] = self.life[i][j]
-                            self.e[i][j] = 0
-                            self.life[i][j] = 0
+                    directions = [(di, dj) for di in [-1, 0, 1] for dj in [-1, 0, 1] if not (di == 0 and dj == 0)]
+                    random.shuffle(directions)
 
-        # Размножение клеток
+                    for si, sj in directions:
+                        ni, nj = i + si, j + sj
+                        if 0 <= ni < self.N and 0 <= nj < self.N:
+                            if self.cells_state[ni][nj] == 0:
+                                self.cells_state[i][j] = 0
+                                self.cells_state[ni][nj] = 1
+                                move[ni][nj] = 0
+                                self.e[ni][nj] = self.e[i][j]
+                                self.life[ni][nj] = self.life[i][j]
+                                self.e[i][j] = 0
+                                self.life[i][j] = 0
+                                break
+
+            # Размножение клеток
         done = [[1] * self.N for i in range(self.N)]
         for i in range(self.N):
             for j in range(self.N):
