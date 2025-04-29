@@ -45,7 +45,7 @@ class CellularAutomaton:
 
         # Инициализация случайных живых клеток
         for i in range(int(A * N * N)):
-            self.cells_state[random.randint(0, int((self.N - 1) * 0.7))][random.randint(0, int((self.N - 1) * 1))] = 1
+            self.cells_state[random.randint(0, int((self.N - 1) * 0.6))][random.randint(0, int((self.N - 1) * 1))] = 1
         # for i in range(int(N)):
         #     self.cells_state[i][int((self.N - 1)*0.5)] = 1
 
@@ -236,6 +236,7 @@ class CellularAutomaton:
                     if event.key == pygame.K_ESCAPE:
                         plt.plot(COUNT, ACTIVE)
                         plt.savefig("active_cells_plot.png")
+                        np.savez('lab2.npz', active=ACTIVE, count=COUNT)
                         running = False
 
                     # elif event.type == pygame.MOUSEBUTTONDOWN:
