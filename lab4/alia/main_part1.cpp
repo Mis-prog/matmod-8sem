@@ -42,11 +42,11 @@ int main() {
 
             double hy1 = y_j - y_j_left;
             double hy2 = y_j_right - y_j;
-            // double hy1 = 0.0001;
-            // double hy2 = 0.0001;
-            // cout << fixed << setprecision(20) <<  y_j_left << " " << y_j << " "  << y_j_right <<  endl;
-            // cout << fixed << setprecision(20) <<  hy1 << " " << hy2 << endl;
-            //             double hy1 = 0.1, hy2 = 0.1;
+//             double hy1 = 0.0001;
+//             double hy2 = 0.0001;
+//             cout << fixed << setprecision(20) <<  y_j_left << " " << y_j << " "  << y_j_right <<  endl;
+//             cout << fixed << setprecision(20) <<  hy1 << " " << hy2 << endl;
+//                         double hy1 = 0.1, hy2 = 0.1;
             u[i][j] = u[i - 1][j]
                       + hx / u[i - 1][j] *
                       (2 * nu / (hy2 * (hy1 + hy2)) * u[i - 1][j + 1]

@@ -238,7 +238,7 @@ class CellularAutomaton:
                         plt.xlabel('Такт')
                         plt.ylabel('Кол-во живых')
                         plt.savefig("active_cells_plot.png")
-                        np.savez('lab2.npz', active=ACTIVE, count=COUNT)
+                        # np.savez('lab2.npz', active=ACTIVE, count=COUNT)
                         running = False
 
                     # elif event.type == pygame.MOUSEBUTTONDOWN:
