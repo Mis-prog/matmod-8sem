@@ -30,20 +30,20 @@ plt.title("Погран слой")
 plt.show()
 
 # Апроксимация
-from scipy.optimize import curve_fit
-regional = np.loadtxt("result/regional.txt")
-
-def funk(x, a):
-    return a * np.sqrt(x)
-
-x = regional[:,0]
-y = regional[:,1]
-
-params, _ = curve_fit(funk, x, y)
-a_opt = params[0]
-plt.plot(x ,y,color='r', label = 'Погран слой')
-plt.plot(x, funk(x, a_opt), color='black',ls='--', label=rf"Аппроксимация: $f(x) = {a_opt:.4f} \sqrt{{x}}$")
-plt.legend()
+# from scipy.optimize import curve_fit
+# regional = np.loadtxt("result/regional.txt")
+#
+# def funk(x, a):
+#     return a * np.sqrt(x)
+#
+# x = regional[:,0]
+# y = regional[:,1]
+#
+# params, _ = curve_fit(funk, x, y)
+# a_opt = params[0]
+# plt.plot(x ,y,color='r', label = 'Погран слой')
+# plt.plot(x, funk(x, a_opt), color='black',ls='--', label=rf"Аппроксимация: $f(x) = {a_opt:.4f} \sqrt{{x}}$")
+# plt.legend()
 plt.show()
 
 
