@@ -45,7 +45,7 @@ class CellularAutomaton:
 
         # Инициализация случайных живых клеток
         for i in range(int(A * N * N)):
-            self.cells_state[random.randint(0, int((self.N - 1) * 0.6))][random.randint(0, int((self.N - 1) * 1))] = 1
+            self.cells_state[random.randint(0, int((self.N - 1)*0.6))][random.randint(0, int((self.N - 1) * 1))] = 1
         # for i in range(int(N)):
         #     self.cells_state[i][int((self.N - 1)*0.5)] = 1
 
@@ -61,6 +61,15 @@ class CellularAutomaton:
         # Данные для графика
         self.count_history = []
         self.alive_history = []
+        self.energy_history = []
+        self.zrelye_history = []
+        self.newborn_history = []
+        self.death_history = []
+        self.age_histories = []
+        self.death_by_age_total = [0] * (L + 1)  # итоговая статистика по возрастам
+        self.death_by_age = [0] * (L + 1)  # на текущем такте
+        print("cdfdsf",len(self.death_by_age))
+        self.death_age_histories = []  # история по тактам
 
         # Создаем объект Figure для графика
         self.fig, self.ax = plt.subplots(1, 1, figsize=(6, 6), dpi=80)
@@ -68,6 +77,8 @@ class CellularAutomaton:
         self.canvas = agg.FigureCanvasAgg(self.fig)
 
     def action(self):
+        death_count = 0
+
         # Ресурсы и энергия
         for i in range(self.N):
             for j in range(self.N):
@@ -85,7 +96,13 @@ class CellularAutomaton:
                     if self.life[i][j] > L or self.e[i][j] <= 0:
                         self.cells_state[i][j] = 0
                         self.e[i][j] = 0
+                        dead_age = self.life[i][j]
+                        # print(dead_age)
+                        if dead_age >= len(self.death_by_age):
+                            dead_age = len(self.death_by_age) - 1
+                        self.death_by_age[dead_age] += 1
                         self.life[i][j] = 0
+                        death_count += 1
 
         # Движение клеток
         move = [[1] * self.N for i in range(self.N)]
@@ -108,8 +125,7 @@ class CellularAutomaton:
                                     bl = l
                                     bp = self.p[k][l]
 
-
-                # Обновление состояния клеток
+                    # Обновление состояния клеток
                     move[bk][bl] = 0
                     if bk != i or bl != j:
                         self.cells_state[i][j] = 0
@@ -119,6 +135,7 @@ class CellularAutomaton:
                         self.e[i][j] = 0
                         self.life[i][j] = 0
 
+        newborn_count = 0
         # Размножение клеток
         done = [[1] * self.N for i in range(self.N)]
         for i in range(self.N):
@@ -131,6 +148,7 @@ class CellularAutomaton:
                                 if (dest == 1 and l < self.N and l >= 0 and k < self.N and k >= 0 and (
                                         l != j or k != i)):
                                     self.cells_state[k][l] = 1
+                                    newborn_count += 1
                                     self.e[i][j] -= dr
                                     self.e[k][l] = self.e[i][j]
                                     done[k][l] = 0
@@ -140,9 +158,39 @@ class CellularAutomaton:
                                     dest = 0
 
         # Обновление данных для графика
-        alive, _ = self.countAliveCells()
-        self.count_history.append(self.count)
+        # alive, _ = self.countAliveCells()
+
+        from collections import defaultdict
+
+        alive = 0
+        zrelye = 0
+        total_energy = 0
+        age_hist = [0] * (L + 1)
+        for i in range(self.N):
+            for j in range(self.N):
+                if self.cells_state[i][j] == 1:
+                    age = self.life[i][j]
+                    if age <= L:
+                        age_hist[age] += 1
+                    alive += 1
+                    total_energy += self.e[i][j]
+                    if self.life[i][j] >= T:
+                        zrelye += 1
+        self.death_age_histories.append(self.death_by_age[:])
+        for i in range(L + 1):
+            self.death_by_age_total[i] += self.death_by_age[i]
+        self.death_by_age = [0] * (L + 1)
+
         self.alive_history.append(alive)
+        self.energy_history.append(total_energy)
+        self.zrelye_history.append(zrelye)
+        self.count_history.append(self.count)
+        self.newborn_history.append(newborn_count)
+        self.death_history.append(death_count)
+        self.age_histories.append(age_hist)
+
+        max_life = max(max(row) for row in self.life)
+        print(f'Максимальная продолжительность жизни клеток: {max_life}')
 
         # # Ограничиваем историю для экономии памяти
         # if len(self.count_history) > 100:
@@ -157,30 +205,6 @@ class CellularAutomaton:
                     alive += 1
         dead = self.N * self.N - alive
         return alive, dead
-
-    def update_graph(self):
-        self.ax.clear()
-        self.ax.set_title('Статистика симуляции')
-        self.ax.set_xlabel('Такт')
-        self.ax.set_ylabel('Количество')
-
-        if len(self.count_history) > 0:
-            self.ax.plot(self.count_history, self.alive_history, 'g-', label='Живые клетки')
-            self.ax.legend(loc='upper left')
-            self.ax.grid(True)
-
-            # Динамически масштабируем оси Y для лучшей видимости
-            if max(self.alive_history) > 0:
-                self.ax.set_ylim(0, max(self.alive_history) * 1.2)
-
-        self.canvas.draw()
-        renderer = self.canvas.get_renderer()
-        raw_data = renderer.buffer_rgba()
-        size = self.canvas.get_width_height()
-
-        # Создаем pygame поверхность из matplotlib figure
-        surf = pygame.image.frombuffer(raw_data, size, "RGBA")
-        return surf
 
     def draw(self):
         self.screen.fill(self.WHITE)
@@ -200,11 +224,8 @@ class CellularAutomaton:
         # self.screen.blit(graph_surf, (self.width, 50))
         # self.draw_grid()
 
-
         # Отображение информации
         alive, dead = self.countAliveCells()
-        ACTIVE.append(alive)
-        COUNT.append(self.count)
         text = f"Такт: {self.count} | Живые: {alive} | Мёртвые: {dead}"
         text_surface = self.font.render(text, True, (0, 0, 0))
         self.screen.blit(text_surface, (0, 100))
@@ -234,11 +255,24 @@ class CellularAutomaton:
                     running = False
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        plt.plot(COUNT, ACTIVE)
+                        plt.plot(self.count_history, self.alive_history, label='Кол-во живых')
+                        plt.plot(self.count_history, self.zrelye_history, label='Кол-во зрелых')
+                        plt.plot(self.count_history, self.energy_history, label='Кол-во энергии')
                         plt.xlabel('Такт')
-                        plt.ylabel('Кол-во живых')
+                        plt.legend()
                         plt.savefig("active_cells_plot.png")
-                        # np.savez('lab2.npz', active=ACTIVE, count=COUNT)
+                        np.savez("metrics.npz",
+                                 count=self.count_history,
+                                 energy=self.energy_history,
+                                 zrelye=self.zrelye_history,
+                                 alive=self.alive_history,
+                                 death=self.death_history,
+                                 newborn=self.newborn_history)
+                        age_history = np.array(self.age_histories)
+                        death_age_histories = np.array(self.death_age_histories)
+                        np.save("age_history.npy", age_history)
+                        np.save("death_age_histories.npy", death_age_histories)
+
                         running = False
 
                     # elif event.type == pygame.MOUSEBUTTONDOWN:
@@ -263,6 +297,7 @@ class CellularAutomaton:
         pygame.quit()
         plt.close(self.fig)  # Закрываем фигуру matplotlib
         sys.exit()
+
     def draw_grid(self):
         """Функция для отрисовки сетки."""
         for i in range(1, self.N):

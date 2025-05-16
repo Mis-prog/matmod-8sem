@@ -10,9 +10,9 @@ matplotlib.use('TkAgg')
 print("Текущая рабочая директория:", os.getcwd())
 
 # Загружаем данные
-iter1 = 700
-iter2 = 702
-iter3 = 704
+iter1 = 100
+iter2 = 101
+iter3 = 102
 
 data1 = np.loadtxt(f'../result_alia/data_{iter1}.txt')
 Z1 = np.loadtxt(f'../result_alia/z_{iter1}.txt')
@@ -40,7 +40,6 @@ ax3 = fig.add_subplot(1, 3, 3, projection='3d')
 
 # Первая поверхность
 surf1 = ax1.plot_surface(X1, Y1, Z1, cmap='viridis', alpha=0.9)
-ax1.set_zlim(-2, 2)
 ax1.set_title(f'ynull = {data1[0]}, eps = {data1[1]}, k = {data1[2]}')
 ax1.set_xlabel('x')
 ax1.set_ylabel('y')
@@ -48,7 +47,6 @@ ax1.set_zlabel('z')
 
 # Вторая поверхность
 surf2 = ax2.plot_surface(X2, Y2, Z2, cmap='viridis', alpha=0.9)
-ax2.set_zlim(-2, 2)
 ax2.set_title(f'ynull = {data2[0]}, eps = {data2[1]}, k = {data2[2]}')
 ax2.set_xlabel('x')
 ax2.set_ylabel('y')
@@ -56,7 +54,6 @@ ax2.set_zlabel('z')
 
 # Вторая поверхность
 surf3 = ax3.plot_surface(X3, Y3, Z3, cmap='viridis', alpha=0.9)
-ax3.set_zlim(-2, 2)
 ax3.set_title(f'ynull = {data3[0]}, eps = {data3[1]}, k = {data3[2]}')
 ax3.set_xlabel('x')
 ax3.set_ylabel('y')

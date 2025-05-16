@@ -15,9 +15,9 @@ namespace rustem {
     double L = 10;
     double Lpml = 5;
     double k = 10;
-    double eps = 0.0;
+    double eps = 10;
     double ynull = 0.5;
-    int iter = 34;
+    int iter = 1005;
 
     void run() {
         LIB lib(Nx, Ny, L, Lpml, ynull, k, eps);
@@ -63,52 +63,52 @@ namespace rustem {
         //     std::cout << "k = " << k << " :: " << duration.count() << " seconds\n";
         //     iter++;
         // }
-
-        iter = 700;
-        std::vector<double> eps_vals{0, 1, 5, 15, 30};
-        for (int i = 0; i < eps_vals.size(); i++) {
-            ynull = 0.5;
-            Lpml = 5;
-            k = 5;
-            eps = eps_vals[i];
-            auto start = std::chrono::high_resolution_clock::now();
-            LIB lib(Nx, Ny, L, Lpml, ynull, k, eps);
-            lib.calc(iter);
-            auto stop = std::chrono::high_resolution_clock::now();
-            auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start);
-            std::cout << "eps = " << eps << " :: " << duration.count() << " seconds\n";
-            iter++;
-        }
-
-        iter = 800;
-        for (int i = 0; i < eps_vals.size(); i++) {
-            Lpml = 5;
-            k = 5;
-            ynull = 0.7;
-            eps = eps_vals[i];
-            auto start = std::chrono::high_resolution_clock::now();
-            LIB lib(Nx, Ny, L, Lpml, ynull, k, eps);
-            lib.calc(iter);
-            auto stop = std::chrono::high_resolution_clock::now();
-            auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start);
-            std::cout << "eps = " << eps << " :: " << duration.count() << " seconds\n";
-            iter++;
-        }
-
-        iter = 900;
-        for (int i = 0; i < eps_vals.size(); i++) {
-            Lpml = 5;
-            k = 5;
-            ynull = 0.9;
-            eps = eps_vals[i];
-            auto start = std::chrono::high_resolution_clock::now();
-            LIB lib(Nx, Ny, L, Lpml, ynull, k, eps);
-            lib.calc(iter);
-            auto stop = std::chrono::high_resolution_clock::now();
-            auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start);
-            std::cout << "eps = " << eps << " :: " << duration.count() << " seconds\n";
-            iter++;
-        }
+        //
+        // iter = 700;
+        // std::vector<double> eps_vals{0, 1, 5, 15, 30};
+        // for (int i = 0; i < eps_vals.size(); i++) {
+        //     ynull = 0.5;
+        //     Lpml = 5;
+        //     k = 5;
+        //     eps = eps_vals[i];
+        //     auto start = std::chrono::high_resolution_clock::now();
+        //     LIB lib(Nx, Ny, L, Lpml, ynull, k, eps);
+        //     lib.calc(iter);
+        //     auto stop = std::chrono::high_resolution_clock::now();
+        //     auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start);
+        //     std::cout << "eps = " << eps << " :: " << duration.count() << " seconds\n";
+        //     iter++;
+        // }
+        //
+        // iter = 800;
+        // for (int i = 0; i < eps_vals.size(); i++) {
+        //     Lpml = 5;
+        //     k = 5;
+        //     ynull = 0.7;
+        //     eps = eps_vals[i];
+        //     auto start = std::chrono::high_resolution_clock::now();
+        //     LIB lib(Nx, Ny, L, Lpml, ynull, k, eps);
+        //     lib.calc(iter);
+        //     auto stop = std::chrono::high_resolution_clock::now();
+        //     auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start);
+        //     std::cout << "eps = " << eps << " :: " << duration.count() << " seconds\n";
+        //     iter++;
+        // }
+        //
+        // iter = 900;
+        // for (int i = 0; i < eps_vals.size(); i++) {
+        //     Lpml = 5;
+        //     k = 5;
+        //     ynull = 0.9;
+        //     eps = eps_vals[i];
+        //     auto start = std::chrono::high_resolution_clock::now();
+        //     LIB lib(Nx, Ny, L, Lpml, ynull, k, eps);
+        //     lib.calc(iter);
+        //     auto stop = std::chrono::high_resolution_clock::now();
+        //     auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start);
+        //     std::cout << "eps = " << eps << " :: " << duration.count() << " seconds\n";
+        //     iter++;
+        // }
         // std::vector<double> y0_vals{0.5, 0.7, 0.9};
         // for (int i = 0; i < y0_vals.size(); i++) {
         //     Lpml = 5;
@@ -187,7 +187,7 @@ namespace rustem {
 // }
 
 int main() {
-    rustem::run_full();
+    rustem::run();
     // rustem::run_full();
     return 0;
 }
