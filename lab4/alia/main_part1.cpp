@@ -42,6 +42,8 @@ int main() {
     double min_hy = 1e10;
     double max_hy = 0.0;
 
+    ofstream out_stab1("../lab4/alia/result/stab1.txt"), out_stab2("../lab4/alia/result/stab2.txt");
+
     bool found = false;
     for (int i = 1; i < Nx; i++) {
         for (int j = 1; j < Ny - 1; j++) {
@@ -62,7 +64,8 @@ int main() {
             //             double hy2 = 0.0001;
             //             cout << fixed << setprecision(20) <<  y_j_left << " " << y_j << " "  << y_j_right <<  endl;
             //             cout << fixed << setprecision(20) <<  hy1 << " " << hy2 << endl;
-            //                         double hy1 = 0.1, hy2 = 0.1;
+            //     double hy1 = 0.1, hy2 = 0.1;
+
             u[i][j] = u[i - 1][j]
                       + hx / u[i - 1][j] *
                       (2 * nu / (hy2 * (hy1 + hy2)) * u[i - 1][j + 1]
@@ -81,8 +84,10 @@ int main() {
                 found = true;
             }
 
-            double stability_1 = 2 * nu * hx / (u[i][j] * hy1 * hy2);
+            double stability_1 = 2 * nu * hx / (u[i][j] * hy1 * hy1);
             double stability_2 = (v[i][j] * v[i][j]) * hx / (u[i][j] * nu);
+            out_stab1 << std::fixed << std::setprecision(6) << stability_1 << " ";
+            out_stab2 << std::fixed << std::setprecision(6) << stability_2 << " ";
 
             if (stability_1 > 1.0 || stability_2 > 2.0) {
                 cout << "⚠️ Нарушено условие устойчивости в i=" << i << ", j=" << j << endl;
@@ -90,8 +95,12 @@ int main() {
             }
         }
         found = false;
+        out_stab1 << endl;
+        out_stab2 << endl;
         // cout << i << endl;
     }
+    out_stab1.close();
+    out_stab2.close();
 
     cout << fixed << setprecision(10);
     cout << "Минимальный hy: " << min_hy << endl;
